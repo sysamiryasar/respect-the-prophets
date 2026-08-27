@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { TRIALS, WHEEL } from '../data/journey'
 import { useJourney } from '../lib/journey'
@@ -7,7 +7,7 @@ import ParticleField from '../components/visuals/ParticleField'
 import Plate from '../components/Plate'
 import { GeometricPattern, Rosette } from '../components/visuals/GeometricPattern'
 import { Grain, Vignette } from '../components/ui'
-import { Eyebrow, Statement } from './kit'
+import { Eyebrow, Statement, useRevealOnSelect } from './kit'
 
 /* ================================================================== */
 /*  SECTION 5 — THE TRIALS                                             */
@@ -169,6 +169,8 @@ const R = 39 // % of the wheel box
 export function LessonsScene() {
   const { reduced, cue, compact } = useJourney()
   const [index, setIndex] = useState<number | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  useRevealOnSelect(panelRef, index)
   const active = index !== null ? WHEEL[index] : null
 
   // The wheel turns so the chosen lesson comes to the top.
@@ -265,8 +267,8 @@ export function LessonsScene() {
                           boxShadow: on ? '0 0 44px -6px rgba(211,173,104,.75)' : 'none',
                         }}
                       >
-                        <span className="font-arabic text-base text-gold-soft sm:text-lg" lang="ar">
-                          {l.arabic.slice(0, 3)}
+                        <span className="font-arabic text-[0.8rem] text-gold-soft sm:text-sm" lang="ar">
+                          {l.short}
                         </span>
                       </span>
                       <span
@@ -296,7 +298,7 @@ export function LessonsScene() {
           </div>
 
           {/* ── the explanation ──────────────────────────────────── */}
-          <div className="flex min-h-[18rem] items-center justify-center">
+          <div ref={panelRef} className="flex min-h-[18rem] items-center justify-center">
             <AnimatePresence mode="wait">
               {active ? (
                 <motion.div

@@ -343,6 +343,8 @@ export interface WheelLesson {
   id: string
   title: string
   arabic: string
+  /** Undiacritised form, short enough to sit inside the wheel's disc. */
+  short: string
   body: string
   reference: string
 }
@@ -352,6 +354,7 @@ export const WHEEL: WheelLesson[] = [
     id: 'tawheed',
     title: 'Tawheed',
     arabic: 'تَوْحِيد',
+    short: 'توحيد',
     body: 'Worship Allah alone. Every messenger arrived with the same first sentence — it is not one lesson among many, it is the reason there were messengers at all.',
     reference: 'Qur’an 21:25',
   },
@@ -359,6 +362,7 @@ export const WHEEL: WheelLesson[] = [
     id: 'sabr',
     title: 'Sabr',
     arabic: 'صَبْر',
+    short: 'صبر',
     body: 'Patience is not silence about pain. Ya‘qub (AS) wept until his sight went and still called it beautiful patience — because he brought his grief to Allah rather than to despair.',
     reference: 'Qur’an 12:18',
   },
@@ -366,6 +370,7 @@ export const WHEEL: WheelLesson[] = [
     id: 'tawakkul',
     title: 'Tawakkul',
     arabic: 'تَوَكُّل',
+    short: 'توكل',
     body: 'Do everything in your power, then hand the outcome to the One who controls outcomes. Nuh (AS) still had to build. Musa (AS) still had to walk to the shore.',
     reference: 'Qur’an 26:62',
   },
@@ -373,6 +378,7 @@ export const WHEEL: WheelLesson[] = [
     id: 'sidq',
     title: 'Truthfulness',
     arabic: 'صِدْق',
+    short: 'صدق',
     body: 'Honesty that goes past speech into character — being the same person in private that you claim to be in public. The Messenger ﷺ was called Al-Amin before prophethood.',
     reference: 'Qur’an 19:41',
   },
@@ -380,6 +386,7 @@ export const WHEEL: WheelLesson[] = [
     id: 'rahmah',
     title: 'Mercy',
     arabic: 'رَحْمَة',
+    short: 'رحمة',
     body: 'Not weakness — strength that chooses restraint. The final Messenger ﷺ is described not as a mercy to one tribe or century, but to all the worlds.',
     reference: 'Qur’an 21:107',
   },
@@ -387,6 +394,7 @@ export const WHEEL: WheelLesson[] = [
     id: 'adl',
     title: 'Justice',
     arabic: 'عَدْل',
+    short: 'عدل',
     body: 'Owed even to people you dislike, and even when the ruling goes against you. Dawud (AS) was given kingship and told, in the same breath, to judge with truth.',
     reference: 'Qur’an 38:26',
   },
@@ -394,6 +402,7 @@ export const WHEEL: WheelLesson[] = [
     id: 'afw',
     title: 'Forgiveness',
     arabic: 'عَفْو',
+    short: 'عفو',
     body: 'To erase a wrong you had every right to pursue. It is only possible when you actually hold the power to retaliate — which is exactly when Yusuf (AS) let it go.',
     reference: 'Qur’an 12:92',
   },
@@ -401,6 +410,7 @@ export const WHEEL: WheelLesson[] = [
     id: 'tawadu',
     title: 'Humility',
     arabic: 'تَوَاضُع',
+    short: 'تواضع',
     body: 'Sulayman (AS) was given a kingdom unlike any other, and his response to that power was not pride but a prayer to be enabled to be grateful.',
     reference: 'Qur’an 27:19',
   },

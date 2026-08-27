@@ -8,7 +8,7 @@ import ProphetGlyph from '../components/visuals/ProphetGlyph'
 import Plate from '../components/Plate'
 import { OrnamentDivider } from '../components/visuals/GeometricPattern'
 import { Grain, Vignette, useInViewSafe } from '../components/ui'
-import { Eyebrow, Statement } from './kit'
+import { Eyebrow, Statement, useRevealOnSelect } from './kit'
 import { useRef } from 'react'
 
 /** The golden path the points sit on, in a 0–100 space. */
@@ -21,6 +21,8 @@ export function ProphetsScene() {
   const mapRef = useRef<HTMLDivElement>(null)
   const inView = useInViewSafe(mapRef, { once: true, amount: 0.25 })
 
+  const panelRef = useRef<HTMLDivElement>(null)
+  useRevealOnSelect(panelRef, open)
   const point = PATH_PROPHETS.find((p) => p.id === open) ?? null
   const prophet = point ? PROPHET_BY_ID[point.id] : null
 
@@ -29,7 +31,7 @@ export function ProphetsScene() {
       id="prophets"
       data-scene="prophets"
       aria-label="The Prophets"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-24"
+      className="relative flex min-h-[100svh] w-full flex-col items-center justify-start px-5 pt-28 pb-20"
     >
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
         <AnimatePresence>
@@ -76,12 +78,12 @@ export function ProphetsScene() {
           </p>
         </div>
 
-        <OrnamentDivider className="my-12" />
+        <OrnamentDivider className="my-8" />
 
         {/* ── the golden path ──────────────────────────────────────── */}
         <div
           ref={mapRef}
-          className={`relative mx-auto w-full ${compact ? 'h-[34rem] max-w-sm' : 'h-[22rem] max-w-5xl'}`}
+          className={`relative mx-auto w-full ${compact ? 'h-[34rem] max-w-sm' : 'h-[19rem] max-w-5xl'}`}
           role="group"
           aria-label="A golden path of seven prophets. Select a point to read about that prophet."
         >
@@ -96,22 +98,23 @@ export function ProphetsScene() {
                 d={PATH_D}
                 fill="none"
                 stroke="#d3ad68"
-                strokeWidth="1.5"
+                strokeWidth="7"
                 vectorEffect="non-scaling-stroke"
-                strokeOpacity="0.12"
+                strokeOpacity="0.13"
                 strokeLinecap="round"
               />
               <path
                 d={PATH_D}
                 fill="none"
-                stroke="#f6e5bf"
-                strokeWidth="1.5"
+                stroke="#f0d9a8"
+                strokeWidth="2.5"
                 vectorEffect="non-scaling-stroke"
-                strokeOpacity="0.55"
+                strokeOpacity="0.85"
                 strokeLinecap="round"
-                strokeDasharray="600"
-                strokeDashoffset={reduced || inView ? 0 : 600}
-                style={{ transition: 'stroke-dashoffset 2.6s cubic-bezier(.16,1,.3,1)' }}
+                pathLength={1}
+                strokeDasharray={1}
+                strokeDashoffset={reduced || inView ? 0 : 1}
+                style={{ transition: 'stroke-dashoffset 2.4s cubic-bezier(.16,1,.3,1)' }}
               />
             </svg>
           )}
@@ -153,8 +156,8 @@ export function ProphetsScene() {
                     : { opacity: 0, scale: 0.4 }
                 }
                 transition={{
-                  duration: reduced ? 0 : 0.9,
-                  delay: reduced ? 0 : 0.5 + i * 0.12,
+                  duration: reduced ? 0 : 0.7,
+                  delay: reduced ? 0 : 0.25 + i * 0.07,
                   ease: [0.16, 1, 0.3, 1],
                 }}
               >
@@ -187,7 +190,7 @@ export function ProphetsScene() {
         </div>
 
         {/* ── the cinematic panel ──────────────────────────────────── */}
-        <div className="mt-14 flex min-h-[19rem] justify-center">
+        <div ref={panelRef} className="mt-8 flex min-h-[10rem] w-full justify-center">
           <AnimatePresence mode="wait">
             {point && prophet ? (
               <motion.article

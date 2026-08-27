@@ -8,7 +8,16 @@ import ParticleField from '../components/visuals/ParticleField'
 import Plate from '../components/Plate'
 import { GeometricPattern } from '../components/visuals/GeometricPattern'
 import { Grain, Vignette } from '../components/ui'
-import { Beat, Eyebrow, InfoPanel, Scene, SceneRail, SceneVeil, Statement } from './kit'
+import {
+  Beat,
+  Eyebrow,
+  InfoPanel,
+  Scene,
+  SceneRail,
+  SceneVeil,
+  Statement,
+  useRevealOnSelect,
+} from './kit'
 
 export function StoriesScene() {
   return (
@@ -66,6 +75,8 @@ function StoryEnvironmentScene({ story, order }: { story: StoryEnvironment; orde
   const { reduced, cue } = useJourney()
   const p = PROPHET_BY_ID[story.id]
   const [open, setOpen] = useState<number | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  useRevealOnSelect(panelRef, open)
   const isMusa = story.id === 'musa'
 
   return (
@@ -204,7 +215,7 @@ function StoryEnvironmentScene({ story, order }: { story: StoryEnvironment; orde
             })}
           </ul>
 
-          <div className="mt-10 flex min-h-[13rem] justify-center">
+          <div ref={panelRef} className="mt-10 flex min-h-[13rem] justify-center">
             <AnimatePresence mode="wait">
               {open !== null ? (
                 <InfoPanel

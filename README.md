@@ -205,6 +205,21 @@ The particle system is deliberately cheap: glow comes from a single pre-rendered
 sprite rather than `shadowBlur`, counts scale to viewport area and halve on small
 screens, and every canvas pauses when scrolled out of view or when the tab is hidden.
 
+## Visual QA
+
+```bash
+npx playwright install chromium   # once
+node scripts/capture.mjs --url http://localhost:5178/ --out .qa
+node scripts/capture.mjs --url http://localhost:5178/ --out .qa-mob --mobile
+```
+
+[`scripts/capture.mjs`](scripts/capture.mjs) walks the journey in a real rendering
+browser: it screenshots every scene at four points through its scroll track, clicks
+each interaction and screenshots the result, and writes a `report.json` with console
+errors, horizontal overflow, and any element bleeding out of its container. Looking at
+the output is how the fire stopped being a row of spikes and the crescent moon stopped
+being a full disc.
+
 ## Accessibility
 
 - Full keyboard support: skip link, gold focus rings, arrow keys on the stepper /

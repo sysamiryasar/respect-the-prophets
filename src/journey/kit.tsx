@@ -338,10 +338,37 @@ export function InfoPanel({
 
 /* ------------------------------------------------------------------ */
 
-/** The thin veil that cuts cleanly between scenes. */
+/**
+ * The veil that cuts cleanly between scenes.
+ *
+ * Kept deliberately tight: at 7% of a 320svh track this was ~1.5 screens of
+ * black at each end, so consecutive scenes gave roughly three screens of
+ * dead scrolling between them.
+ */
 export function SceneVeil({ progress }: { progress: MotionValue<number> }) {
-  const opacity = useTransform(progress, [0, 0.07, 0.93, 1], [1, 0, 0, 1])
+  const opacity = useTransform(progress, [0, 0.03, 0.97, 1], [1, 0, 0, 1])
   return <motion.div aria-hidden="true" className="absolute inset-0 z-10 bg-ink" style={{ opacity }} />
+}
+
+/**
+ * Bring a panel into view when the selection changes, but never scroll if it
+ * is already on screen — opening a hotspot should not yank the page.
+ */
+export function useRevealOnSelect(ref: React.RefObject<HTMLElement | null>, key: unknown) {
+  const { reduced } = useJourney()
+  useEffect(() => {
+    if (key === null || key === undefined) return
+    const el = ref.current
+    if (!el) return
+    const r = el.getBoundingClientRect()
+    const fullyVisible = r.top >= 64 && r.bottom <= window.innerHeight - 16
+    if (fullyVisible) return
+    const t = window.setTimeout(
+      () => el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' }),
+      reduced ? 0 : 120,
+    )
+    return () => window.clearTimeout(t)
+  }, [key, ref, reduced])
 }
 
 /** Bottom-of-scene progress hairline. */

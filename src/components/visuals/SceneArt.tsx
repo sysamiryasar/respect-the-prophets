@@ -354,10 +354,13 @@ function IbrahimArt({ progress, accent }: ArtProps) {
       <Sky id={`sky${u}`} top="#050510" bottom={cool > 0.5 ? '#0a1c26' : '#1a0d08'} />
       <StarPoints seed={7} count={110} maxY={460} />
 
-      {/* the moon, crossing the sky */}
+      {/* the moon, crossing the sky.
+          The inner arc needs a LARGER radius than the outer and the same
+          sweep, or SVG scales it up to fit the chord and you get a full
+          disc instead of a crescent. */}
       <g transform={`translate(${moonX.toFixed(1)} ${lerp(150, 96, progress).toFixed(1)})`}>
-        <circle cx="0" cy="0" r="46" fill="#f6e5bf" opacity="0.14" />
-        <path d="M0,-30 A30,30 0 1,0 0,30 A24,24 0 1,1 0,-30 Z" fill="#f6e5bf" opacity="0.75" />
+        <circle cx="0" cy="0" r="34" fill="#f6e5bf" opacity="0.07" />
+        <path d="M0,-30 A30,30 0 1,0 0,30 A40,40 0 0,0 0,-30 Z" fill="#f6e5bf" opacity="0.9" />
       </g>
 
       {/* desert dunes */}
@@ -396,20 +399,46 @@ function IbrahimArt({ progress, accent }: ArtProps) {
         </defs>
         <Glow id={`fg${u}`} cx={600} cy={520} r={lerp(300, 420, progress)} color={fireColor} strength={0.4} />
         <g transform="translate(600 546)">
-          {Array.from({ length: 13 }, (_, i) => {
-            const t = (i - 6) / 6
-            const x = t * 250
-            const h = lerp(230, 300, 1 - Math.abs(t)) * (0.6 + 0.4 * Math.abs(Math.sin(i * 2.1)))
-            const w = 46 - Math.abs(t) * 16
-            return (
-              <path
-                key={i}
-                d={`M${x - w / 2},0 Q${x - w * 0.22},${-h * 0.55} ${x + (i % 2 ? 10 : -10)},${-h} Q${x + w * 0.3},${-h * 0.5} ${x + w / 2},0 Z`}
-                fill={`url(#fire${u})`}
-                opacity={0.5 + (i % 3) * 0.15}
-              />
-            )
-          })}
+          {/* Three layers — a broad body, mid tongues, and a hot core — each
+              built from cubic curves that lean and curl, so the fire reads as
+              flame rather than as a row of spikes. */}
+          {[
+            { n: 9, spread: 250, base: 230, hMin: 0.55, w: 96, o: 0.32, lean: 34 },
+            { n: 13, spread: 236, base: 270, hMin: 0.5, w: 62, o: 0.42, lean: -26 },
+            { n: 7, spread: 150, base: 190, hMin: 0.6, w: 44, o: 0.6, lean: 18 },
+          ].map((layer, li) =>
+            Array.from({ length: layer.n }, (_, i) => {
+              const t = layer.n === 1 ? 0 : (i - (layer.n - 1) / 2) / ((layer.n - 1) / 2)
+              const x = t * layer.spread
+              // taller in the middle, with a stable per-flame wobble
+              const wob = 0.5 + 0.5 * Math.abs(Math.sin(i * 2.3 + li * 1.7))
+              const h = layer.base * (layer.hMin + (1 - layer.hMin) * (1 - Math.abs(t) * 0.75)) * (0.7 + 0.3 * wob)
+              const w = layer.w * (0.55 + 0.45 * (1 - Math.abs(t) * 0.6))
+              // the tip leans away from centre, like real flame licks
+              const lean = layer.lean * t + (i % 2 ? 9 : -9)
+              const d = [
+                `M${(-w / 2).toFixed(1)},0`,
+                // left edge: out, pinch in, then curl to the tip
+                `C${(-w * 0.62).toFixed(1)},${(-h * 0.3).toFixed(1)}`,
+                `${(-w * 0.2 + lean * 0.35).toFixed(1)},${(-h * 0.66).toFixed(1)}`,
+                `${lean.toFixed(1)},${(-h).toFixed(1)}`,
+                // right edge back down
+                `C${(w * 0.24 + lean * 0.35).toFixed(1)},${(-h * 0.64).toFixed(1)}`,
+                `${(w * 0.62).toFixed(1)},${(-h * 0.32).toFixed(1)}`,
+                `${(w / 2).toFixed(1)},0`,
+                'Z',
+              ].join(' ')
+              return (
+                <path
+                  key={`${li}-${i}`}
+                  d={d}
+                  transform={`translate(${x.toFixed(1)} 0)`}
+                  fill={`url(#fire${u})`}
+                  opacity={layer.o * (0.7 + 0.3 * wob)}
+                />
+              )
+            }),
+          )}
         </g>
         {/* the cool light that replaces it */}
         <LightShafts x={600} y={210} count={7} spread={420} length={340} color="#e8f6ff" opacity={cool * 0.16} />

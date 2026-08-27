@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useTransform } from 'framer-motion'
 import { PATH_POINTS } from '../data/journey'
 import { useJourney } from '../lib/journey'
@@ -6,7 +6,18 @@ import DesertPath from '../components/visuals/DesertPath'
 import ParticleField from '../components/visuals/ParticleField'
 import { GeometricPattern, Rosette, OrnamentDivider } from '../components/visuals/GeometricPattern'
 import { GoldButton, Grain, Vignette } from '../components/ui'
-import { Beat, Eyebrow, Hotspot, InfoPanel, Scene, SceneRail, SceneVeil, ScrollCue, Statement } from './kit'
+import {
+  Beat,
+  Eyebrow,
+  Hotspot,
+  InfoPanel,
+  Scene,
+  SceneRail,
+  SceneVeil,
+  ScrollCue,
+  Statement,
+  useRevealOnSelect,
+} from './kit'
 
 const STAGE_TIMINGS = [300, 1100, 1900, 2700, 3600]
 
@@ -173,7 +184,9 @@ export function IntroScene() {
 export function WhyScene() {
   const { reduced, cue } = useJourney()
   const [open, setOpen] = useState<string | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const active = PATH_POINTS.find((p) => p.id === open) ?? null
+  useRevealOnSelect(panelRef, open)
 
   return (
     <>
@@ -298,7 +311,7 @@ export function WhyScene() {
             })}
           </div>
 
-          <div className="mt-14 flex min-h-[15rem] justify-center">
+          <div ref={panelRef} className="mt-14 flex min-h-[15rem] justify-center">
             <AnimatePresence mode="wait">
               {active ? (
                 <InfoPanel

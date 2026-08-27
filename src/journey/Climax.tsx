@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnimatePresence, motion, useTransform, type MotionValue } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
 import { QUALITIES, RESPECT_STEPS, FINAL_LINES } from '../data/journey'
@@ -10,7 +10,16 @@ import ParticleField from '../components/visuals/ParticleField'
 import Plate from '../components/Plate'
 import { GeometricPattern, Rosette, OrnamentDivider } from '../components/visuals/GeometricPattern'
 import { GoldButton, Grain, SourceTag, Vignette } from '../components/ui'
-import { Beat, Eyebrow, InfoPanel, Scene, SceneRail, SceneVeil, Statement } from './kit'
+import {
+  Beat,
+  Eyebrow,
+  InfoPanel,
+  Scene,
+  SceneRail,
+  SceneVeil,
+  Statement,
+  useRevealOnSelect,
+} from './kit'
 
 const MERCY = VERSES.find((v) => v.id === 'v-21-107')!
 const M = PROPHET_BY_ID.muhammad
@@ -22,6 +31,8 @@ const M = PROPHET_BY_ID.muhammad
 export function MuhammadScene() {
   const { reduced, cue } = useJourney()
   const [open, setOpen] = useState<string | null>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  useRevealOnSelect(panelRef, open)
   const active = QUALITIES.find((q) => q.id === open) ?? null
 
   return (
@@ -166,7 +177,7 @@ export function MuhammadScene() {
             })}
           </ul>
 
-          <div className="mt-12 flex min-h-[13rem] justify-center">
+          <div ref={panelRef} className="mt-12 flex min-h-[13rem] justify-center">
             <AnimatePresence mode="wait">
               {active ? (
                 <InfoPanel
@@ -236,7 +247,7 @@ export function ActionScene() {
       id="action"
       data-scene="action"
       aria-label="How do we show respect"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-24"
+      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-16"
     >
       <div aria-hidden="true" className="absolute inset-0">
         <div
@@ -258,7 +269,7 @@ export function ActionScene() {
         </div>
 
         {/* the path climbs as you go down the list */}
-        <ol className="mt-16 space-y-3">
+        <ol className="mt-10 space-y-2.5">
           {RESPECT_STEPS.map((s, i) => {
             const on = open === i
             const last = i === RESPECT_STEPS.length - 1
@@ -285,7 +296,7 @@ export function ActionScene() {
                     className="absolute top-0 left-0 h-px bg-gradient-to-r from-transparent via-gold to-transparent transition-all duration-700"
                     style={{ width: on ? '100%' : '0%' }}
                   />
-                  <span className="flex items-baseline gap-5 px-6 py-6 sm:px-8">
+                  <span className="flex items-baseline gap-5 px-6 py-5 sm:px-8">
                     <span
                       className="font-display shrink-0 text-[0.72rem] tracking-[0.3em] tabular-nums transition-colors duration-500"
                       style={{ color: on ? '#d3ad68' : 'rgba(211,173,104,.45)' }}
@@ -295,7 +306,7 @@ export function ActionScene() {
                     <span
                       className={`font-display leading-none font-light uppercase transition-all duration-700 ${
                         last
-                          ? 'text-[clamp(1.7rem,6vw,3.4rem)]'
+                          ? 'text-[clamp(1.5rem,5vw,2.9rem)]'
                           : 'text-[clamp(1.2rem,3.6vw,2rem)]'
                       }`}
                       style={{ color: on ? '#f6e5bf' : '#ece4d5' }}
@@ -315,7 +326,7 @@ export function ActionScene() {
                     style={{ gridTemplateRows: on ? '1fr' : '0fr' }}
                   >
                     <span className="overflow-hidden">
-                      <span className="block px-6 pb-7 pl-[3.6rem] text-sm leading-relaxed text-ivory/78 sm:px-8 sm:pl-[4.4rem] sm:text-[0.95rem]">
+                      <span className="block px-6 pb-6 pl-[3.6rem] text-sm leading-relaxed text-ivory/78 sm:px-8 sm:pl-[4.4rem] sm:text-[0.95rem]">
                         {s.body}
                       </span>
                     </span>
@@ -326,7 +337,7 @@ export function ActionScene() {
           })}
         </ol>
 
-        <p className="font-display mt-16 text-center text-[clamp(1.4rem,5vw,2.8rem)] leading-tight font-light">
+        <p className="font-display mt-12 text-center text-[clamp(1.3rem,4.4vw,2.4rem)] leading-tight font-light">
           <span className="text-gilded anim-shimmer uppercase">Live the lessons.</span>
         </p>
       </div>
@@ -473,20 +484,30 @@ function DawnBackdrop({ progress }: { progress: MotionValue<number> }) {
             'linear-gradient(to top, rgba(246,229,191,.30), rgba(211,173,104,.12) 42%, transparent 75%)',
         }}
       />
+      {/* The light sits low, on the horizon — the words live in the calm
+          middle of the frame, not on top of the brightest pixel. */}
       <motion.div
-        className="absolute top-1/2 left-1/2 h-[52vmin] w-[52vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+        className="absolute top-[72%] left-1/2 h-[52vmin] w-[52vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
         style={{
           scale: lightScale,
           background:
-            'radial-gradient(circle, rgba(246,229,191,.85) 0%, rgba(211,173,104,.3) 18%, rgba(211,173,104,.06) 42%, transparent 68%)',
+            'radial-gradient(circle, rgba(246,229,191,.8) 0%, rgba(211,173,104,.28) 18%, rgba(211,173,104,.06) 42%, transparent 68%)',
         }}
       />
       <motion.div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+        className="absolute top-[72%] left-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{ opacity: rosette, scale: lightScale }}
       >
         <Rosette className="h-[70vmin] w-[70vmin]" progress={1} />
       </motion.div>
+      {/* a soft scrim so the statements always clear their background */}
+      <div
+        className="absolute inset-x-0 top-[18%] h-[46%]"
+        style={{
+          background:
+            'radial-gradient(60% 100% at 50% 50%, rgba(3,5,9,.62), rgba(3,5,9,.28) 60%, transparent 80%)',
+        }}
+      />
       <SceneVeil progress={progress} />
       <Vignette strength={0.94} />
       <Grain opacity={0.035} />
