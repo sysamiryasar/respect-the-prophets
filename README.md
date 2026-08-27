@@ -119,9 +119,55 @@ src/
 Framer Motion · Lucide · sharp (build-time only). No GSAP and no Three.js — every
 environment is 2D canvas or SVG, so neither would have earned its bytes.
 
-**Deploying:** `dist/` is a static SPA. `public/_redirects` (Netlify) and `vercel.json`
-are included so deep links resolve. For other hosts, point unknown paths at
-`index.html`.
+---
+
+## Deploying
+
+**Live at <https://sysamiryasar.github.io/respect-the-prophets/>**
+
+`dist/` is a static SPA. Two things matter wherever it goes:
+
+1. **The base path.** Project pages are served from `/<repo>/`, so build with
+   `BASE_PATH` set. At the root (Netlify, Vercel, a custom domain) leave it unset.
+2. **A fallback for deep links.** `/prophets/musa` is a client-side route, so the host
+   must serve the app shell for unknown paths. `public/_redirects` (Netlify) and
+   `vercel.json` do this; GitHub Pages has no rewrite rules, so `404.html` is a copy of
+   `index.html` instead — it comes back with a 404 *status*, then the app boots and
+   routes correctly.
+
+Check a Pages-style build locally before shipping — subpath and fallback included:
+
+```bash
+BASE_PATH=/respect-the-prophets/ npm run build && cp dist/index.html dist/404.html
+npm run preview:pages   # http://localhost:5180/respect-the-prophets/
+```
+
+### Publishing an update
+
+The site currently deploys from the `gh-pages` branch:
+
+```bash
+BASE_PATH=/respect-the-prophets/ npm run build
+cp dist/index.html dist/404.html && touch dist/.nojekyll
+git worktree add --detach ../.ghp-tmp && cd ../.ghp-tmp
+git checkout gh-pages && rm -rf ./* && cp -r ../respect-the-prophets/dist/. .
+git add -A && git commit -m "Deploy" && git push
+```
+
+### Automating it
+
+[`deploy/github-pages.yml`](deploy/github-pages.yml) is a ready GitHub Actions workflow
+that does all of the above on every push to `main`. It isn't active yet: writing to
+`.github/workflows/` needs the `workflow` OAuth scope, which the token used to create
+this repo didn't have. To turn it on:
+
+```bash
+gh auth refresh -h github.com -s workflow
+git mv deploy/github-pages.yml .github/workflows/deploy.yml
+git commit -m "Enable Pages deploy workflow" && git push
+```
+
+Then set **Settings → Pages → Source** to **GitHub Actions**.
 
 ---
 
