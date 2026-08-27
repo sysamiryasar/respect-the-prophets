@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { PLATES, PLATE_WIDTHS } from '../data/plates'
 
+/** Assets live under the deploy base, which is not always the root. */
+const BASE = import.meta.env.BASE_URL
+
 interface Props {
   /** Base name of the plate, e.g. "musa" or "ch-quran". */
   id: string
@@ -34,7 +37,7 @@ export default function Plate({
   const [loaded, setLoaded] = useState(false)
 
   const srcSet = (ext: string) =>
-    PLATE_WIDTHS.map((w) => `/img/${id}-${w}.${ext} ${w}w`).join(', ')
+    PLATE_WIDTHS.map((w) => `${BASE}img/${id}-${w}.${ext} ${w}w`).join(', ')
 
   return (
     <div
@@ -55,7 +58,7 @@ export default function Plate({
         <source type="image/avif" srcSet={srcSet('avif')} sizes={sizes} />
         <source type="image/webp" srcSet={srcSet('webp')} sizes={sizes} />
         <img
-          src={`/img/${id}-1600.webp`}
+          src={`${BASE}img/${id}-1600.webp`}
           alt=""
           width={1600}
           height={900}
