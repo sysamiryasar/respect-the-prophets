@@ -1,0 +1,341 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ */
+/*  Design tokens                                                      */
+/* ------------------------------------------------------------------ */
+@theme {
+  --color-ink: #04070b;
+  --color-ink-2: #070b12;
+  --color-navy: #0a1120;
+  --color-navy-2: #101c33;
+  --color-emerald-deep: #062420;
+  --color-emerald-mid: #0d3a33;
+  --color-gold: #d3ad68;
+  --color-gold-soft: #e7cd9b;
+  --color-gold-bright: #f6e5bf;
+  --color-bronze: #8b6a42;
+  --color-ivory: #ece4d5;
+  --color-ivory-dim: #b9b1a3;
+  --color-ash: #6f6b63;
+
+  --font-display: 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-arabic: 'Amiri', 'Scheherazade New', 'Traditional Arabic', serif;
+
+  --ease-cinema: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Base                                                               */
+/* ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    color-scheme: dark;
+    --nav-h: 4rem;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-ink);
+    color: var(--color-ivory);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  body[data-locked='true'] {
+    overflow: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-gold) 32%, transparent);
+    color: var(--color-gold-bright);
+  }
+
+  /* Focus ring — visible, gold, never hidden */
+  :focus-visible {
+    outline: 2px solid var(--color-gold-soft);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #05080d;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--color-bronze) 60%, #05080d);
+    border-radius: 99px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-bronze);
+  }
+
+  @supports (scrollbar-color: red blue) {
+    html {
+      scrollbar-color: color-mix(in oklab, var(--color-bronze) 60%, #05080d) #05080d;
+      scrollbar-width: thin;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Utilities                                                          */
+/* ------------------------------------------------------------------ */
+@utility font-display {
+  font-family: var(--font-display);
+}
+@utility font-arabic {
+  font-family: var(--font-arabic);
+  direction: rtl;
+}
+
+@utility tracking-cinema {
+  letter-spacing: 0.42em;
+}
+
+@utility text-gilded {
+  background-image: linear-gradient(
+    100deg,
+    #9a7a45 0%,
+    #d3ad68 22%,
+    #f6e5bf 46%,
+    #d3ad68 68%,
+    #9a7a45 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility surface-glass {
+  background: color-mix(in oklab, #070c14 78%, transparent);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  border: 1px solid color-mix(in oklab, var(--color-gold) 15%, transparent);
+}
+
+@utility hairline {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--color-gold) 45%, transparent),
+    transparent
+  );
+}
+
+/* Film grain — pure CSS, GPU cheap, one repeating layer */
+@utility grain {
+  position: relative;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Keyframes (CSS-only ambience — no JS cost)                         */
+/* ------------------------------------------------------------------ */
+@keyframes rtp-shimmer {
+  0% {
+    background-position: 200% 50%;
+  }
+  100% {
+    background-position: -60% 50%;
+  }
+}
+
+@keyframes rtp-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes rtp-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes rtp-spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rtp-spin-rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes rtp-rise {
+  0% {
+    transform: translateY(14px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes rtp-scroll-cue {
+  0% {
+    transform: translateY(-40%);
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(150%);
+    opacity: 0;
+  }
+}
+
+@keyframes rtp-pulse-ring {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes rtp-dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.anim-shimmer {
+  animation: rtp-shimmer 7s linear infinite;
+}
+.anim-breathe {
+  animation: rtp-breathe 7s var(--ease-soft) infinite;
+}
+.anim-spin-slow {
+  animation: rtp-spin-slow 120s linear infinite;
+}
+.anim-spin-rev {
+  animation: rtp-spin-rev 90s linear infinite;
+}
+.anim-scroll-cue {
+  animation: rtp-scroll-cue 2.4s var(--ease-soft) infinite;
+}
+.anim-pulse-ring {
+  animation: rtp-pulse-ring 3.2s var(--ease-soft) infinite;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Reduced motion — global damping                                    */
+/* ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+html[data-motion='reduced'] {
+  scroll-behavior: auto;
+}
+
+html[data-motion='reduced'] *,
+html[data-motion='reduced'] *::before,
+html[data-motion='reduced'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+/* Hide the native cursor only when the custom one is live */
+html[data-cursor='custom'],
+html[data-cursor='custom'] a,
+html[data-cursor='custom'] button,
+html[data-cursor='custom'] [role='button'] {
+  cursor: none;
+}
+
+/* Skip link */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 50%;
+  translate: -50% -160%;
+  z-index: 200;
+  padding: 0.7rem 1.4rem;
+  background: #0b1424;
+  border: 1px solid var(--color-gold);
+  color: var(--color-gold-bright);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  transition: translate 0.25s var(--ease-cinema);
+}
+.skip-link:focus-visible {
+  translate: -50% 0;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
