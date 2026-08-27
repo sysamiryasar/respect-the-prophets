@@ -32,11 +32,36 @@ outright that it is *not* a precise chronology.
 
 ---
 
-## Structure — nine chapters, nine pages
+## The journey — one continuous experience at `/`
+
+The landing route is a single scroll-driven journey, not a slideshow and not a set of
+pages. Ten named sections run **Intro → Why → Iman → Prophets → Stories → Trials →
+Lessons → Muhammad ﷺ → Action → Final**, tracked by a top progress bar you can click to
+jump anywhere.
+
+It alternates two modes on purpose:
+
+- **Pinned cinematic runs** — the frame sticks to the viewport while the artwork and
+  typography advance with your scroll. The desert road travels forward, Nuh's storm
+  rises, Ibrahim's fire cools into light, **Musa's sea opens into two walls of water**,
+  and the finale fades night into dawn.
+- **Stable interactive stages** — where you're meant to click and explore, nothing moves
+  under you: four glowing points on the road, the six-pillar constellation, a golden
+  path of seven prophets, three expanding trials, an eight-spoke wheel of character that
+  turns your choice to the top, five floating qualities, and a five-step path upward.
+
+Yusuf's story is a **draggable horizontal journey** — well → prison → palace — that
+becomes a vertical list on mobile.
+
+> The chapter pages below still exist and still work; the journey just sits in front of
+> them. To swap them back, change the `index` route in `src/App.tsx` from `JourneyPage`
+> to `HomePage`.
+
+## The chapters — nine pages
 
 | Route | Chapter | What it does |
 |---|---|---|
-| `/` | Opening | Staged reveal, then an index of all nine chapters |
+| `/chapters` | Index | Staged reveal, then an index of all nine chapters |
 | `/why` | 01 Why Respect? | Line-by-line reveal building to “We believe in them all” |
 | `/pillars` | 02 Six Pillars | Interactive wheel; nodes expand, others dim |
 | `/prophets` | 03 The Prophets | 16 cards on a celestial rail (vertical on mobile) |

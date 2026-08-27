@@ -64,7 +64,8 @@ export default function Plate({
           height={900}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
-          fetchPriority={priority ? 'high' : 'auto'}
+          // React 18 does not map the camelCase prop; pass the real attribute.
+          {...{ fetchpriority: priority ? 'high' : 'auto' }}
           onLoad={() => setLoaded(true)}
           onError={() => setLoaded(true)}
           className="absolute inset-0 h-full w-full object-cover transition-opacity duration-1000"

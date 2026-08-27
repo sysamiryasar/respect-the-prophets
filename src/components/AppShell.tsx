@@ -59,7 +59,8 @@ export default function AppShell() {
       </a>
 
       <CustomCursor />
-      <Navigation />
+      {/* The journey at "/" carries its own progress nav. */}
+      {pathname !== '/' && <Navigation />}
 
       <AnimatePresence mode="wait">
         <motion.main

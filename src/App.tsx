@@ -4,10 +4,11 @@ import { MotionConfig } from 'framer-motion'
 import { JourneyProvider, useJourney } from './lib/journey'
 
 import AppShell from './components/AppShell'
-import HomePage from './pages/HomePage'
+import JourneyPage from './pages/JourneyPage'
 
 /* The opening page is all that is needed for first paint; every chapter is
    its own chunk, fetched when the reader opens it. */
+const HomePage = lazy(() => import('./pages/HomePage'))
 const WhyPage = lazy(() => import('./pages/WhyPage'))
 const PillarsPage = lazy(() => import('./pages/PillarsPage'))
 const ProphetsPage = lazy(() => import('./pages/ProphetsPage'))
@@ -41,7 +42,15 @@ function Shell() {
     <MotionConfig reducedMotion={reduced ? 'always' : 'never'}>
       <Routes>
         <Route element={<AppShell />}>
-          <Route index element={<HomePage />} />
+          <Route index element={<JourneyPage />} />
+          <Route
+            path="chapters"
+            element={
+              <Suspense fallback={<ChapterFallback />}>
+                <HomePage />
+              </Suspense>
+            }
+          />
           <Route
             path="why"
             element={
