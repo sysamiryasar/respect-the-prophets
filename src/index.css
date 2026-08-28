@@ -26,12 +26,98 @@
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ------------------------------------------------------------------ *
+ *  Theming
+ *
+ *  The token names are ROLES, not literal colours. `ink` is always the
+ *  page ground and `ivory` is always the primary text — in the light
+ *  theme those two simply trade places, and the gold ramp inverts so
+ *  that `gold-bright` stays the highest-emphasis accent at either end.
+ *
+ *  Tailwind v4 compiles theme values to CSS variables and every utility
+ *  reads them through var(), so redefining them here re-skins every
+ *  bg-ink / text-ivory / border-gold in the app at once.
+ *
+ *  The *-rgb channels exist for the many inline gradients and scrims,
+ *  which are written as rgb(var(--ink-rgb) / .5).
+ * ------------------------------------------------------------------ */
+:root {
+  --ink-rgb: 4 7 11;
+  --ink-2-rgb: 7 11 18;
+  --navy-rgb: 10 17 32;
+  --navy-2-rgb: 16 28 51;
+  --emerald-rgb: 13 58 51;
+  --gold-rgb: 211 173 104;
+  --gold-soft-rgb: 231 205 155;
+  --gold-bright-rgb: 246 229 191;
+  --bronze-rgb: 139 106 66;
+  --ivory-rgb: 236 228 213;
+  --ivory-dim-rgb: 185 177 163;
+  /* An actual light SOURCE. Unlike the gold ramp this must not invert —
+     a lamp on parchment is still warm, not dark. */
+  --glow-rgb: 246 229 191;
+  /* Scrims darken artwork so text can sit on it. On parchment they LIGHTEN
+     it instead, so they have to be pulled right back or every silhouette
+     washes out. calc() in the alpha slot lets all 13 share one dial. */
+  --scrim-k: 1;
+
+  /* art */
+  --art-star: #f6e5bf;
+  --art-shaft: #f6e5bf;
+  --art-sky-wash: 0;
+  --glass-bg: color-mix(in oklab, #070c14 78%, transparent);
+  --glass-border: color-mix(in oklab, var(--color-gold) 15%, transparent);
+  --gild: linear-gradient(100deg, #9a7a45 0%, #d3ad68 22%, #f6e5bf 46%, #d3ad68 68%, #9a7a45 100%);
+  --scrollbar-track: #05080d;
+}
+
+html[data-theme='light'] {
+  color-scheme: light;
+
+  --color-ink: #f7f2e7;
+  --color-ink-2: #f1eade;
+  --color-navy: #e7dfcd;
+  --color-navy-2: #d6cab2;
+  --color-emerald-deep: #dde7dd;
+  --color-emerald-mid: #a9c3b2;
+  --color-gold: #9a7328;
+  --color-gold-soft: #7c5a18;
+  --color-gold-bright: #56390a;
+  --color-bronze: #ae8a45;
+  --color-ivory: #191509;
+  --color-ivory-dim: #3a3426;
+  --color-ash: #6f6b63;
+
+  --ink-rgb: 247 242 231;
+  --ink-2-rgb: 241 234 222;
+  --navy-rgb: 231 223 205;
+  --navy-2-rgb: 214 202 178;
+  --emerald-rgb: 169 195 178;
+  --gold-rgb: 154 115 40;
+  --gold-soft-rgb: 124 90 24;
+  --gold-bright-rgb: 86 57 10;
+  --bronze-rgb: 174 138 69;
+  --ivory-rgb: 25 21 9;
+  --ivory-dim-rgb: 58 52 36;
+  --glow-rgb: 224 176 86;
+  --scrim-k: 0.4;
+
+  /* On parchment the art inverts its relationship: dark silhouettes
+     against a luminous ground, and ink stipple where stars were. */
+  --art-star: #7c6234;
+  --art-shaft: #b98f3e;
+  --art-sky-wash: 1;
+  --glass-bg: color-mix(in oklab, #fffaf0 82%, transparent);
+  --glass-border: color-mix(in oklab, var(--color-gold) 30%, transparent);
+  --gild: linear-gradient(100deg, #7c5a18 0%, #a67c2a 22%, #5c3f0e 46%, #a67c2a 68%, #7c5a18 100%);
+  --scrollbar-track: #ece3d2;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Base                                                               */
 /* ------------------------------------------------------------------ */
 @layer base {
   :root {
-    color-scheme: dark;
     --nav-h: 4rem;
   }
 
@@ -99,10 +185,10 @@
     height: 9px;
   }
   ::-webkit-scrollbar-track {
-    background: #05080d;
+    background: var(--scrollbar-track);
   }
   ::-webkit-scrollbar-thumb {
-    background: color-mix(in oklab, var(--color-bronze) 60%, #05080d);
+    background: color-mix(in oklab, var(--color-bronze) 60%, var(--scrollbar-track));
     border-radius: 99px;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -111,7 +197,8 @@
 
   @supports (scrollbar-color: red blue) {
     html {
-      scrollbar-color: color-mix(in oklab, var(--color-bronze) 60%, #05080d) #05080d;
+      scrollbar-color: color-mix(in oklab, var(--color-bronze) 60%, var(--scrollbar-track))
+        var(--scrollbar-track);
       scrollbar-width: thin;
     }
   }
@@ -133,14 +220,7 @@
 }
 
 @utility text-gilded {
-  background-image: linear-gradient(
-    100deg,
-    #9a7a45 0%,
-    #d3ad68 22%,
-    #f6e5bf 46%,
-    #d3ad68 68%,
-    #9a7a45 100%
-  );
+  background-image: var(--gild);
   background-size: 220% 100%;
   -webkit-background-clip: text;
   background-clip: text;
@@ -148,10 +228,13 @@
 }
 
 @utility surface-glass {
-  background: color-mix(in oklab, #070c14 78%, transparent);
-  backdrop-filter: blur(18px) saturate(1.25);
-  -webkit-backdrop-filter: blur(18px) saturate(1.25);
-  border: 1px solid color-mix(in oklab, var(--color-gold) 15%, transparent);
+  background: var(--glass-bg);
+  /* The nav is on screen the whole way down, so its backdrop-filter is
+     re-evaluated against moving content on every frame. 10px reads the
+     same and costs noticeably less. */
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  border: 1px solid var(--glass-border);
 }
 
 @utility hairline {
@@ -307,6 +390,46 @@ html[data-cursor='custom'] [role='button'] {
   cursor: none;
 }
 
+/* ------------------------------------------------------------------ *
+ *  Offscreen work
+ *
+ *  The journey is ~40 screens tall and every scene was being styled,
+ *  laid out and painted whether or not it was anywhere near the viewport.
+ *  content-visibility lets the browser skip all of that until a scene
+ *  approaches.
+ *
+ *  .cv is for scenes with an explicit height (the pinned ones) — their box
+ *  is already known, so nothing can shift. .cv-screen is for the ordinary
+ *  full-height sections, where 'auto' remembers the real size after the
+ *  first render and 100svh is a close first guess.
+ * ------------------------------------------------------------------ */
+.cv {
+  content-visibility: auto;
+}
+/* The placeholder must match the section's real height or the page grows
+   and shrinks as you scroll through it. One class per section height. */
+.cv-screen {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 100svh;
+}
+.cv-80 {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 80svh;
+}
+.cv-70 {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 70svh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv,
+  .cv-screen,
+  .cv-80,
+  .cv-70 {
+    content-visibility: visible;
+  }
+}
+
 /* Skip link */
 .skip-link {
   position: fixed;
@@ -315,7 +438,7 @@ html[data-cursor='custom'] [role='button'] {
   translate: -50% -160%;
   z-index: 200;
   padding: 0.7rem 1.4rem;
-  background: #0b1424;
+  background: var(--color-ink-2);
   border: 1px solid var(--color-gold);
   color: var(--color-gold-bright);
   font-size: 0.75rem;

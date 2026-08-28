@@ -88,7 +88,7 @@ export default function PillarsPage() {
                 y1="50"
                 x2={50 + Math.cos(a) * RADIUS}
                 y2={50 + Math.sin(a) * RADIUS}
-                stroke={p.highlight ? '#d3ad68' : '#8b6a42'}
+                stroke={p.highlight ? 'var(--color-gold)' : 'var(--color-bronze)'}
                 strokeWidth={on ? 0.5 : 0.25}
                 strokeOpacity={active ? (on ? 0.85 : 0.12) : p.highlight ? 0.6 : 0.3}
                 style={{ transition: 'stroke-opacity .7s, stroke-width .7s' }}
@@ -107,7 +107,7 @@ export default function PillarsPage() {
         >
           <span
             aria-hidden="true"
-            className="absolute inset-0 rounded-full border border-gold/35 bg-ink/80 backdrop-blur-sm transition-all duration-700 group-hover:border-gold/70 group-hover:shadow-[0_0_60px_-8px_rgba(211,173,104,.55)]"
+            className="absolute inset-0 rounded-full border border-gold/35 bg-ink/80 backdrop-blur-sm transition-all duration-700 group-hover:border-gold/70 group-hover:shadow-[0_0_60px_-8px_rgb(var(--gold-rgb) / .55)]"
           />
           {!reduced && (
             <span
@@ -153,7 +153,7 @@ export default function PillarsPage() {
                 aria-hidden="true"
                 className={`relative flex h-[clamp(3rem,10vw,4.6rem)] w-[clamp(3rem,10vw,4.6rem)] items-center justify-center rounded-full border backdrop-blur-sm transition-all duration-500 ${
                   on
-                    ? 'border-gold bg-gold/15 shadow-[0_0_46px_-6px_rgba(211,173,104,.7)]'
+                    ? 'border-gold bg-gold/15 shadow-[0_0_46px_-6px_rgb(var(--gold-rgb) / .7)]'
                     : p.highlight
                       ? 'border-gold/55 bg-ink/80 hover:border-gold'
                       : 'border-gold/25 bg-ink/80 hover:border-gold/60'
@@ -259,7 +259,7 @@ export default function PillarsPage() {
             onClick={() => setSecret(false)}
           >
             <div aria-hidden="true" className="absolute inset-0 bg-ink/95 backdrop-blur-xl" />
-            <ParticleField weather="stars" density={1.4} color="#f6e5bf" opacity={0.8} />
+            <ParticleField weather="stars" density={1.4} color="var(--color-gold)" opacity={0.8} />
             <div className="relative max-w-2xl text-center">
               <motion.p
                 initial={reduced ? false : { opacity: 0, y: 24, filter: 'blur(12px)' }}

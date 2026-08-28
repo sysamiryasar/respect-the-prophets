@@ -58,7 +58,7 @@ export default function WhyPage() {
           initial={reduced ? false : { opacity: 0, scale: 0.6 }}
           animate={statementIn ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.6 }}
           transition={{ duration: 2.4, ease: [0.16, 1, 0.3, 1] }}
-          style={{ background: 'radial-gradient(circle, rgba(211,173,104,.16), transparent 66%)' }}
+          style={{ background: 'radial-gradient(circle, rgb(var(--gold-rgb) / .16), transparent 66%)' }}
         />
 
         <motion.p
@@ -106,7 +106,7 @@ export default function WhyPage() {
             className="absolute inset-0 opacity-40"
             style={{
               background:
-                'linear-gradient(140deg, rgba(211,173,104,.08), transparent 45%, rgba(13,58,51,.14))',
+                'linear-gradient(140deg, rgb(var(--gold-rgb) / .08), transparent 45%, rgb(var(--emerald-rgb) / .14))',
             }}
           />
           <div className="relative">

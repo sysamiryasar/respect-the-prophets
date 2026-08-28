@@ -1,4 +1,5 @@
 import { memo, useId } from 'react'
+import { ac, ground, isLight, shaftColor, sky, starColor } from '../../lib/art'
 
 const W = 1200
 const H = 675
@@ -12,7 +13,7 @@ const H = 675
  */
 function DesertPathImpl({
   progress = 0,
-  accent = '#d3ad68',
+  accent: accentIn = '#d3ad68',
   /** Vanishing point, as a fraction of the height. */
   horizon = 0.46,
 }: {
@@ -20,6 +21,8 @@ function DesertPathImpl({
   accent?: string
   horizon?: number
 }) {
+  const accent = ac(accentIn)
+  const light = isLight()
   const u = useId().replace(/:/g, '')
   const hy = H * horizon
   const t = Math.max(0, Math.min(1, progress))
@@ -47,9 +50,9 @@ function DesertPathImpl({
     <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="xMidYMid slice" className="h-full w-full">
       <defs>
         <linearGradient id={`sky${u}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#03050a" />
-          <stop offset="70%" stopColor="#081020" />
-          <stop offset="100%" stopColor="#0d1424" />
+          <stop offset="0%" stopColor={sky('#03050a', 0)} />
+          <stop offset="70%" stopColor={sky('#081020', 0.6)} />
+          <stop offset="100%" stopColor={sky('#0d1424', 1)} />
         </linearGradient>
         <radialGradient id={`glow${u}`} cx="0.5" cy={String(horizon)} r="0.42">
           <stop offset="0%" stopColor={accent} stopOpacity={0.55 + t * 0.3} />
@@ -57,8 +60,8 @@ function DesertPathImpl({
           <stop offset="100%" stopColor={accent} stopOpacity="0" />
         </radialGradient>
         <linearGradient id={`road${u}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={accent} stopOpacity={0.24} />
-          <stop offset="45%" stopColor={accent} stopOpacity={0.09} />
+          <stop offset="0%" stopColor={accent} stopOpacity={light ? 0.13 : 0.24} />
+          <stop offset="45%" stopColor={accent} stopOpacity={light ? 0.05 : 0.09} />
           <stop offset="100%" stopColor={accent} stopOpacity={0.02} />
         </linearGradient>
       </defs>
@@ -66,7 +69,7 @@ function DesertPathImpl({
       <rect width={W} height={H} fill={`url(#sky${u})`} />
 
       {/* stars, thinning toward the horizon glow */}
-      <g fill="#f6e5bf">
+      <g fill={starColor()}>
         {Array.from({ length: 90 }, (_, i) => {
           let s = (i * 9301 + 49297) % 233280
           const r1 = s / 233280
@@ -98,8 +101,8 @@ function DesertPathImpl({
             <path
               key={i}
               d={`M${600 - 10},${hy} L${600 + 10},${hy} L${600 + dx + 70},${hy - 320} L${600 + dx - 70},${hy - 320} Z`}
-              fill="#f6e5bf"
-              opacity={1 - Math.abs(i - 3) / 4}
+              fill={shaftColor()}
+              opacity={(1 - Math.abs(i - 3) / 4) * (light ? 0.5 : 1)}
             />
           )
         })}
@@ -108,11 +111,11 @@ function DesertPathImpl({
       {/* distant mountains */}
       <path
         d={`M0,${hy} L120,${hy - 66} L240,${hy - 22} L360,${hy - 92} L470,${hy - 30} L560,${hy} Z`}
-        fill="#060b14"
+        fill={ground('#060b14', 0.1)}
       />
       <path
         d={`M640,${hy} L740,${hy - 44} L860,${hy - 86} L980,${hy - 34} L1090,${hy - 72} L1200,${hy} Z`}
-        fill="#060b14"
+        fill={ground('#060b14', 0.1)}
       />
 
       {/* the road, receding */}
@@ -140,9 +143,9 @@ function DesertPathImpl({
       </g>
 
       {/* dunes flanking the road */}
-      <path d={ridge(hy + 26, 16, 0.6)} fill="#0a0d12" opacity="0.96" />
-      <path d={ridge(hy + 96, 26, 2.4)} fill="#070910" />
-      <path d={ridge(hy + 210, 30, 4.1)} fill="#04060b" />
+      <path d={ridge(hy + 26, 16, 0.6)} fill={ground('#0a0d12', 0.4)} opacity="0.96" />
+      <path d={ridge(hy + 96, 26, 2.4)} fill={ground('#070910', 0.7)} />
+      <path d={ridge(hy + 210, 30, 4.1)} fill={ground('#04060b', 1)} />
 
       {/* the road is cut back in over the dunes so it stays readable */}
       <path

@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useCallback, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -41,7 +42,7 @@ export default function ScenePage() {
     {
       content: (
         <div>
-          <p className="font-arabic text-3xl sm:text-5xl" style={{ color: prophet.accent }} lang="ar">
+          <p className="font-arabic text-3xl sm:text-5xl" style={{ color: ac(prophet.accent) }} lang="ar">
             {prophet.arabic}
           </p>
           <h1 className="font-display mt-5 text-[clamp(2.4rem,10vw,6.5rem)] leading-none font-light uppercase">
@@ -50,7 +51,7 @@ export default function ScenePage() {
               {prophet.honorific}
             </span>
           </h1>
-          <OrnamentDivider className="mt-8" color={prophet.accent} />
+          <OrnamentDivider className="mt-8" color={ac(prophet.accent)} />
           <p className="mt-8 text-[0.68rem] tracking-[0.38em] text-ivory-dim/55 uppercase">
             {prophet.epithet}
           </p>
@@ -81,7 +82,7 @@ export default function ScenePage() {
                 lang="ar"
                 dir="rtl"
                 className="font-arabic mt-5 text-[clamp(1.1rem,2.8vw,1.6rem)] leading-[2]"
-                style={{ color: prophet.accent }}
+                style={{ color: ac(prophet.accent) }}
               >
                 {verse.arabic}
               </p>
@@ -106,16 +107,16 @@ export default function ScenePage() {
       <div aria-hidden="true" className="fixed inset-0 -z-10">
         <Plate id={key} priority opacity={0.95} />
         <div className="absolute inset-0 opacity-80">
-          <SceneArt art={key} progress={progress} accent={prophet.accent} />
+          <SceneArt art={key} progress={progress} accent={ac(prophet.accent)} />
         </div>
         <div
           className="absolute inset-0 transition-colors duration-1000"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(4,7,11,.4), rgba(4,7,11,.62) 45%, rgba(4,7,11,.92))',
+              'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.4 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.62 * var(--scrim-k))) 45%, rgb(var(--ink-rgb) / calc(.92 * var(--scrim-k))))',
           }}
         />
-        <ParticleField weather={prophet.weather} density={0.95} color={prophet.accent} opacity={0.6} />
+        <ParticleField weather={prophet.weather} density={0.95} color={ac(prophet.accent)} opacity={0.6} />
         <Vignette strength={0.85} />
         <Grain opacity={0.034} />
       </div>
@@ -125,11 +126,11 @@ export default function ScenePage() {
         <div className="flex items-center gap-4">
           <span
             className="font-display text-[0.64rem] tracking-[0.34em] tabular-nums"
-            style={{ color: prophet.accent }}
+            style={{ color: ac(prophet.accent) }}
           >
             Scene {String(order + 1).padStart(2, '0')} / {SCENE_ORDER.length}
           </span>
-          <span aria-hidden="true" className="h-px w-8 opacity-25" style={{ background: prophet.accent }} />
+          <span aria-hidden="true" className="h-px w-8 opacity-25" style={{ background: ac(prophet.accent) }} />
           <span className="text-[0.62rem] tracking-[0.3em] text-ivory-dim/45 uppercase">
             {scene.kicker}
           </span>
@@ -154,7 +155,7 @@ export default function ScenePage() {
       >
         <SceneStepper
           steps={steps}
-          accent={prophet.accent}
+          accent={ac(prophet.accent)}
           onStep={onStep}
           label={`Scene ${order + 1}: ${prophet.name} ${prophet.honorific}`}
         />
@@ -241,7 +242,7 @@ function SceneLink({ id, dir }: { id: ArtKey; dir: 'prev' | 'next' }) {
           size={20}
           strokeWidth={1.2}
           className="relative shrink-0 transition-transform duration-500 group-hover:translate-x-1.5"
-          style={{ color: p.accent }}
+          style={{ color: ac(p.accent) }}
         />
       )}
     </Link>

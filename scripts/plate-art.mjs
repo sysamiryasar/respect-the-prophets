@@ -27,7 +27,47 @@ function seeded(seed) {
   }
 }
 
-const hex = (c, a) => {
+/* ---- LIGHT MODE ------------------------------------------------------ *
+ * The parchment theme re-reads the same authored palette through these
+ * transforms, so there is one set of plate definitions rather than two.
+ * Lightness is forced (not scaled), which keeps them idempotent.
+ * --------------------------------------------------------------------- */
+function toHsl(h) {
+  const n = h.replace('#', '')
+  const v = parseInt(n.length === 3 ? n.split('').map((c) => c + c).join('') : n, 16)
+  const r = ((v >> 16) & 255) / 255, g = ((v >> 8) & 255) / 255, b = (v & 255) / 255
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2
+  let hu = 0, s2 = 0
+  if (mx !== mn) {
+    const d = mx - mn
+    s2 = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn)
+    hu = mx === r ? ((g - b) / d + (g < b ? 6 : 0)) / 6 : mx === g ? ((b - r) / d + 2) / 6 : ((r - g) / d + 4) / 6
+  }
+  return { h: hu, s: s2, l }
+}
+function fromHsl(h, s, l) {
+  const f = (n) => {
+    const k = (n + h * 12) % 12
+    const a = s * Math.min(l, 1 - l)
+    return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, Math.min(9 - k, 1))))).toString(16).padStart(2, '0')
+  }
+  return `#${f(0)}${f(8)}${f(4)}`
+}
+let LIGHT = false
+export const setLight = (v) => { LIGHT = v }
+const at = (c, l, ss = 1, sm = 1) => {
+  const { h, s } = toHsl(c)
+  return fromHsl(h, Math.min(sm, s * ss), l)
+}
+/** Sky: a pale wash of the same hue. */
+const skyC = (c, depth = 0) => (LIGHT ? at(c, 0.95 - depth * 0.07, 0.9, 0.3) : c)
+/** Terrain and architecture: deep sepia ink, so shapes read as cut paper. */
+const groundC = (c, l = 0.24) => (LIGHT ? at(c, l, 0.7, 0.34) : c)
+/** Accent: driven down so it stays visible against parchment. */
+const accentC = (c) => (LIGHT ? at(c, 0.38, 1.1, 0.7) : c)
+
+const hex = (cIn, a) => {
+  const c = accentC(cIn)
   const n = c.replace('#', '')
   const v = parseInt(
     n.length === 3
@@ -131,7 +171,7 @@ const TERRAIN = {
     ]
     bands.forEach((b, i) => {
       layers.push(
-        `<path d="${horizon(b.y, b.amp, i * 1.9 + rnd())}" fill="${b.c}" opacity="${b.o}"/>`,
+        `<path d="${horizon(b.y, b.amp, i * 1.9 + rnd())}" fill="${groundC(b.c)}" opacity="${b.o}"/>`,
       )
       layers.push(
         `<path d="${horizon(b.y, b.amp, i * 1.9 + rnd())}" fill="none" stroke="${hex(accent, 0.14 - i * 0.035)}" stroke-width="2"/>`,
@@ -148,12 +188,12 @@ const TERRAIN = {
         d += ` L${(x + w / 2).toFixed(0)},${(baseY - h * (0.5 + rnd() * 0.7)).toFixed(0)} L${(x + w).toFixed(0)},${baseY}`
         x += w
       }
-      return `<path d="${d} L${W},${H} Z" fill="${c}" opacity="${o}"/>`
+      return `<path d="${d} L${W},${H} Z" fill="${groundC(c)}" opacity="${o}"/>`
     }
     return [
       mk(520, 210, 0.85, '#0a1018'),
       mk(600, 160, 1, '#070b12'),
-      `<path d="${horizon(700, 16, 2.2)}" fill="#04070b"/>`,
+      `<path d="${horizon(700, 16, 2.2)}" fill="${groundC('#04070b', 0.18)}"/>`,
       `<path d="${horizon(700, 16, 2.2)}" fill="none" stroke="${hex(accent, 0.12)}" stroke-width="2"/>`,
     ].join('')
   },
@@ -167,16 +207,16 @@ const TERRAIN = {
     return bands
       .map(
         (b) =>
-          `<path d="${seaBand(b.y, b.amp, b.p + rnd() * 0.3)}" fill="${b.c}"/>` +
+          `<path d="${seaBand(b.y, b.amp, b.p + rnd() * 0.3)}" fill="${groundC(b.c)}"/>` +
           `<path d="${seaBand(b.y, b.amp, b.p + rnd() * 0.3)}" fill="none" stroke="${hex(accent, 0.16)}" stroke-width="1.6"/>`,
       )
       .join('')
   },
   skyline: (rnd, accent) => {
     return [
-      `<path d="${skyline(600, 0.85, rnd)}" fill="#070c11" opacity="0.9"/>`,
-      `<path d="${skyline(680, 0.7, rnd)}" fill="#04080c"/>`,
-      `<path d="${horizon(740, 10, 1.4)}" fill="#020508"/>`,
+      `<path d="${skyline(600, 0.85, rnd)}" fill="${groundC('#070c11')}" opacity="0.9"/>`,
+      `<path d="${skyline(680, 0.7, rnd)}" fill="${groundC('#04080c', 0.2)}"/>`,
+      `<path d="${horizon(740, 10, 1.4)}" fill="${groundC('#020508', 0.16)}"/>`,
       `<rect x="0" y="736" width="${W}" height="4" fill="${hex(accent, 0.12)}"/>`,
     ].join('')
   },
@@ -185,7 +225,7 @@ const TERRAIN = {
     for (let i = 0; i < 6; i++) {
       const y = 120 + i * 140
       bands.push(
-        `<path d="${seaBand(y, 22 + i * 4, i * 1.6 + rnd())}" fill="#020d13" opacity="${0.18 + i * 0.13}"/>`,
+        `<path d="${seaBand(y, 22 + i * 4, i * 1.6 + rnd())}" fill="${groundC('#020d13')}" opacity="${0.18 + i * 0.13}"/>`,
       )
       bands.push(
         `<path d="${seaBand(y, 22 + i * 4, i * 1.6 + rnd())}" fill="none" stroke="${hex(accent, 0.07)}" stroke-width="1.4"/>`,
@@ -202,7 +242,7 @@ const TERRAIN = {
         `<path d="${seaBand(y, 30, i * 2.1 + rnd())}" fill="${hex(accent, 0.045)}" />`,
       )
     }
-    bands.push(`<path d="${horizon(780, 14, 0.8)}" fill="#03060a"/>`)
+    bands.push(`<path d="${horizon(780, 14, 0.8)}" fill="${groundC('#03060a', 0.18)}"/>`)
     return bands.join('')
   },
 }
@@ -243,7 +283,7 @@ export function buildPlateSvg({
     const y = (rnd() * H * 0.62).toFixed(0)
     const r = (0.6 + rnd() * rnd() * 2.4).toFixed(2)
     const o = (0.14 + rnd() * 0.66).toFixed(2)
-    return `<circle cx="${x}" cy="${y}" r="${r}" fill="#f6e5bf" opacity="${o}"/>`
+    return `<circle cx="${x}" cy="${y}" r="${r}" fill="${LIGHT ? '#7c6234' : '#f6e5bf'}" opacity="${LIGHT ? (o * 0.5).toFixed(2) : o}"/>`
   }).join('')
 
   // A few soft haze ribbons for depth between sky and terrain.
@@ -256,9 +296,9 @@ export function buildPlateSvg({
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${skyTop}"/>
-      <stop offset="55%" stop-color="${skyBottom}"/>
-      <stop offset="100%" stop-color="${skyBottom}"/>
+      <stop offset="0%" stop-color="${skyC(skyTop, 0)}"/>
+      <stop offset="55%" stop-color="${skyC(skyBottom, 0.6)}"/>
+      <stop offset="100%" stop-color="${skyC(skyBottom, 1)}"/>
     </linearGradient>
     <radialGradient id="bloom" cx="${glowX}" cy="${glowY}" r="${glowR}">
       <stop offset="0%" stop-color="${hex(accent, glow)}"/>
@@ -272,9 +312,9 @@ export function buildPlateSvg({
       <stop offset="100%" stop-color="${hex(accent, 0)}"/>
     </linearGradient>
     <radialGradient id="vig" cx="0.5" cy="0.46" r="0.78">
-      <stop offset="45%" stop-color="rgba(2,4,7,0)"/>
-      <stop offset="82%" stop-color="rgba(2,4,7,0.45)"/>
-      <stop offset="100%" stop-color="rgba(2,4,7,0.88)"/>
+      <stop offset="45%" stop-color="${LIGHT ? 'rgba(120,100,60,0)' : 'rgba(2,4,7,0)'}"/>
+      <stop offset="82%" stop-color="${LIGHT ? 'rgba(120,100,60,0.13)' : 'rgba(2,4,7,0.45)'}"/>
+      <stop offset="100%" stop-color="${LIGHT ? 'rgba(120,100,60,0.28)' : 'rgba(2,4,7,0.88)'}"/>
     </radialGradient>
   </defs>
 

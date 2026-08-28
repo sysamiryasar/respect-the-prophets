@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useCallback, useState } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -63,7 +64,7 @@ export default function ProphetPage() {
           lang="ar"
           dir="rtl"
           className="font-arabic mt-5 text-[clamp(1.1rem,2.8vw,1.6rem)] leading-[2]"
-          style={{ color: prophet.accent }}
+          style={{ color: ac(prophet.accent) }}
         >
           {verse.arabic}
         </p>
@@ -80,17 +81,17 @@ export default function ProphetPage() {
       <div aria-hidden="true" className="fixed inset-0 -z-10">
         <Plate id={prophet.id} priority opacity={0.9} />
         <div className="absolute inset-0 opacity-70">
-          <SceneArt art={prophet.id} progress={progress} accent={prophet.accent} />
+          <SceneArt art={prophet.id} progress={progress} accent={ac(prophet.accent)} />
         </div>
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(4,7,11,.42), rgba(4,7,11,.74) 50%, rgba(4,7,11,.95))',
+              'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.42 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.74 * var(--scrim-k))) 50%, rgb(var(--ink-rgb) / calc(.95 * var(--scrim-k))))',
           }}
         />
-        <ParticleField weather={prophet.weather} density={0.85} color={prophet.accent} opacity={0.5} />
-        <GeometricPattern variant="khatam" opacity={0.028} scale={165} color={prophet.accent} />
+        <ParticleField weather={prophet.weather} density={0.85} color={ac(prophet.accent)} opacity={0.5} />
+        <GeometricPattern variant="khatam" opacity={0.028} scale={165} color={ac(prophet.accent)} />
         <Vignette strength={0.8} />
         <Grain opacity={0.032} />
       </div>
@@ -115,7 +116,7 @@ export default function ProphetPage() {
 
           <p
             className="font-arabic mt-8 text-3xl sm:text-5xl"
-            style={{ color: prophet.accent }}
+            style={{ color: ac(prophet.accent) }}
             lang="ar"
           >
             {prophet.arabic}
@@ -126,7 +127,7 @@ export default function ProphetPage() {
               {prophet.honorific}
             </span>
           </h1>
-          <OrnamentDivider className="mt-8" color={prophet.accent} />
+          <OrnamentDivider className="mt-8" color={ac(prophet.accent)} />
           <p className="mt-8 text-[0.68rem] tracking-[0.3em] text-ivory-dim/60 uppercase">
             {prophet.epithet}
           </p>
@@ -137,7 +138,7 @@ export default function ProphetPage() {
 
         {/* ── the symbols ──────────────────────────────────────────── */}
         <div className="mx-auto mt-16 max-w-4xl">
-          <SceneHeading accent={prophet.accent}>The scene</SceneHeading>
+          <SceneHeading accent={ac(prophet.accent)}>The scene</SceneHeading>
           <ul className="mt-8 flex flex-wrap justify-center gap-3">
             {prophet.symbols.map((s, i) => (
               <motion.li
@@ -147,9 +148,9 @@ export default function ProphetPage() {
                 transition={{ duration: 0.7, delay: reduced ? 0 : 0.3 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
                 className="border px-4 py-2 text-[0.66rem] tracking-[0.2em] uppercase backdrop-blur-sm"
                 style={{
-                  borderColor: `${prophet.accent}33`,
-                  color: `${prophet.accent}dd`,
-                  background: `${prophet.accent}0d`,
+                  borderColor: `${ac(prophet.accent)}33`,
+                  color: `${ac(prophet.accent)}dd`,
+                  background: `${ac(prophet.accent)}0d`,
                 }}
               >
                 {s}
@@ -166,7 +167,7 @@ export default function ProphetPage() {
         <div className="mx-auto mt-14 max-w-4xl">
           <SceneStepper
             steps={steps}
-            accent={prophet.accent}
+            accent={ac(prophet.accent)}
             onStep={onStep}
             label={`The story of ${prophet.name} ${prophet.honorific}, told one beat at a time`}
           />
@@ -174,7 +175,7 @@ export default function ProphetPage() {
 
         {/* ── themes ───────────────────────────────────────────────── */}
         <div className="mx-auto mt-20 max-w-4xl">
-          <SceneHeading accent={prophet.accent}>Themes</SceneHeading>
+          <SceneHeading accent={ac(prophet.accent)}>Themes</SceneHeading>
           <ul className="mt-8 flex flex-wrap justify-center gap-2.5">
             {prophet.themes.map((t) => (
               <li
@@ -189,7 +190,7 @@ export default function ProphetPage() {
 
         {/* ── references ───────────────────────────────────────────── */}
         <div className="mx-auto mt-20 max-w-3xl">
-          <SceneHeading accent={prophet.accent}>Where to read more</SceneHeading>
+          <SceneHeading accent={ac(prophet.accent)}>Where to read more</SceneHeading>
           <ul className="mt-10 divide-y divide-gold/10 border-y border-gold/10">
             {prophet.quran.map((q) => (
               <li key={q.ref} className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-5">
@@ -197,7 +198,7 @@ export default function ProphetPage() {
                   size={14}
                   strokeWidth={1.4}
                   className="shrink-0"
-                  style={{ color: prophet.accent }}
+                  style={{ color: ac(prophet.accent) }}
                   aria-hidden="true"
                 />
                 <span className="font-display text-base text-gold-soft">{q.surah}</span>
@@ -291,7 +292,7 @@ function ProphetLink({ prophet, dir }: { prophet: (typeof PROPHETS)[number]; dir
         <ProphetGlyph
           id={prophet.id}
           className="h-6 w-6 shrink-0 transition-transform duration-500 group-hover:translate-x-1.5"
-          color={prophet.accent}
+          color={ac(prophet.accent)}
         />
       )}
     </Link>

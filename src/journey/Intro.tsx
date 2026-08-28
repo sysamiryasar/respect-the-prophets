@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useTransform } from 'framer-motion'
 import { PATH_POINTS } from '../data/journey'
@@ -5,7 +6,7 @@ import { useJourney } from '../lib/journey'
 import DesertPath from '../components/visuals/DesertPath'
 import ParticleField from '../components/visuals/ParticleField'
 import { GeometricPattern, Rosette, OrnamentDivider } from '../components/visuals/GeometricPattern'
-import { GoldButton, Grain, Vignette } from '../components/ui'
+import { GoldButton } from '../components/ui'
 import {
   Beat,
   Eyebrow,
@@ -51,7 +52,7 @@ export function IntroScene() {
       id="intro"
       data-scene="intro"
       aria-label="Respect the Prophets — the opening"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-28"
+      className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-28"
     >
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
         {/* the desert emerges out of the black */}
@@ -72,7 +73,7 @@ export function IntroScene() {
           transition={{ duration: 3.6, ease: [0.16, 1, 0.3, 1] }}
           style={{
             background:
-              'radial-gradient(circle, rgba(211,173,104,.20) 0%, rgba(139,106,66,.09) 25%, rgba(10,17,32,.28) 52%, rgba(4,7,11,0) 72%)',
+              'radial-gradient(circle, rgb(var(--gold-rgb) / .20) 0%, rgb(var(--bronze-rgb) / .09) 25%, rgb(var(--navy-rgb) / .28) 52%, rgb(var(--ink-rgb) / 0) 72%)',
           }}
         />
 
@@ -104,9 +105,6 @@ export function IntroScene() {
           <Rosette className="h-[min(84vmin,720px)] w-[min(84vmin,720px)]" progress={at(3) ? 1 : 0} spin={!reduced} />
         </motion.div>
       </div>
-
-      <Vignette strength={0.92} />
-      <Grain opacity={0.04} />
 
       <div className="relative z-30 flex w-full max-w-4xl flex-col items-center text-center">
         <motion.p
@@ -245,7 +243,7 @@ export function WhyScene() {
       {/* ── the four interactive points ─────────────────────────── */}
       <section
         aria-label="Four things respect asks of us"
-        className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-24"
+        className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-24"
       >
         <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
           <DesertPath progress={0.85} accent={active?.accent ?? '#d3ad68'} />
@@ -257,14 +255,12 @@ export function WhyScene() {
             className="absolute inset-0"
             style={{
               background: active
-                ? `radial-gradient(70% 55% at 50% 55%, ${active.accent}1f, transparent 68%)`
-                : 'radial-gradient(70% 55% at 50% 55%, rgba(10,17,32,.5), transparent 70%)',
+                ? `radial-gradient(70% 55% at 50% 55%, ${ac(active.accent)}1f, transparent 68%)`
+                : 'radial-gradient(70% 55% at 50% 55%, rgb(var(--navy-rgb) / .5), transparent 70%)',
             }}
           />
           <ParticleField weather="dust" density={0.6} color={active?.accent ?? '#d3ad68'} opacity={0.45} />
         </div>
-        <Vignette strength={0.8} />
-        <Grain opacity={0.03} />
 
         <div className="relative z-30 w-full max-w-5xl">
           <p className="text-center text-[0.66rem] tracking-[0.44em] text-gold/70 uppercase">
@@ -300,7 +296,7 @@ export function WhyScene() {
                 <Hotspot
                   key={pt.id}
                   label={pt.title}
-                  accent={pt.accent}
+                  accent={ac(pt.accent)}
                   index={String(i + 1).padStart(2, '0')}
                   active={open === pt.id}
                   dimmed={open !== null && open !== pt.id}
@@ -317,7 +313,7 @@ export function WhyScene() {
                 <InfoPanel
                   key={active.id}
                   title={active.title}
-                  accent={active.accent}
+                  accent={ac(active.accent)}
                   footnote={active.short}
                   onClose={() => {
                     cue('close')
@@ -361,7 +357,7 @@ function BackdropPath({
   return (
     <div aria-hidden="true" className="absolute inset-0">
       <motion.div className="absolute inset-0" style={{ scale }}>
-        <DesertPath progress={step / 40} />
+        <DesertPath progress={step / 14} />
       </motion.div>
       <ParticleField weather="dust" density={0.7} color="#d3ad68" opacity={0.5} />
       <GeometricPattern variant="lattice" opacity={0.022} scale={130} color="#d3ad68" />
@@ -369,12 +365,10 @@ function BackdropPath({
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(to bottom, rgba(4,7,11,.5), rgba(4,7,11,.28) 40%, rgba(4,7,11,.88))',
+            'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.5 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.28 * var(--scrim-k))) 40%, rgb(var(--ink-rgb) / calc(.88 * var(--scrim-k))))',
         }}
       />
       <SceneVeil progress={progress} />
-      <Vignette strength={0.8} />
-      <Grain opacity={0.03} />
       <SceneRail progress={progress} accent="#d3ad68" />
     </div>
   )

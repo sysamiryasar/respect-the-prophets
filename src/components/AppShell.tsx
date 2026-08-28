@@ -98,7 +98,7 @@ export default function AppShell() {
               style={{
                 background:
                   'linear-gradient(to bottom, transparent, #f6e5bf, #d3ad68, transparent)',
-                boxShadow: '0 0 40px 10px rgba(211,173,104,.5)',
+                boxShadow: '0 0 40px 10px rgb(var(--gold-rgb) / .5)',
               }}
               initial={{ left: '-2%' }}
               animate={{ left: ['100%', '102%'] }}

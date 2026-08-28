@@ -21,6 +21,7 @@ const URL = arg('--url', 'http://localhost:5178/')
 const OUT = arg('--out', '.qa')
 const MOBILE = args.includes('--mobile')
 const ONLY = arg('--only', null)
+const THEME = arg('--theme', null)
 
 /** Scroll fractions to sample within each pinned scene's track. */
 const SAMPLES = [0.12, 0.38, 0.62, 0.88]
@@ -49,6 +50,9 @@ async function main() {
       ? { ...devices['iPhone 13'], reducedMotion: 'no-preference' }
       : { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
   )
+  if (THEME) {
+    await ctx.addInitScript((t) => localStorage.setItem('rtp:theme', t), THEME)
+  }
   const page = await ctx.newPage()
 
   const consoleErrors = []

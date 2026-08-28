@@ -20,7 +20,7 @@ import { mkdir, writeFile, readdir, rm } from 'node:fs/promises'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
-import { buildPlateSvg, W, H } from './plate-art.mjs'
+import { buildPlateSvg, setLight, W, H } from './plate-art.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const outDir = join(root, 'public', 'img')
@@ -66,22 +66,38 @@ async function main() {
   const manifest = []
 
   for (const plate of PLATES) {
-    const svg = Buffer.from(buildPlateSvg(plate))
+    const variants = {}
 
-    for (const w of WIDTHS) {
-      const base = sharp(svg, { density: 96 }).resize(w, Math.round((w / W) * H))
-      await base.clone().avif({ quality: 52, effort: 6 }).toFile(join(outDir, `${plate.id}-${w}.avif`))
-      await base.clone().webp({ quality: 76, effort: 5 }).toFile(join(outDir, `${plate.id}-${w}.webp`))
+    // Each plate is rendered twice — night, and the parchment theme, which
+    // re-reads the very same definition through the light-mode transforms.
+    for (const light of [false, true]) {
+      setLight(light)
+      const suffix = light ? '-light' : ''
+      const svg = Buffer.from(buildPlateSvg(plate))
+
+      for (const w of WIDTHS) {
+        const base = sharp(svg, { density: 96 }).resize(w, Math.round((w / W) * H))
+        await base
+          .clone()
+          .avif({ quality: 52, effort: 6 })
+          .toFile(join(outDir, `${plate.id}${suffix}-${w}.avif`))
+        await base
+          .clone()
+          .webp({ quality: 76, effort: 5 })
+          .toFile(join(outDir, `${plate.id}${suffix}-${w}.webp`))
+      }
+
+      // Tiny blur-up placeholder, inlined into the bundle.
+      const lqip = await sharp(svg, { density: 96 })
+        .resize(20, Math.round((20 / W) * H))
+        .blur(1.1)
+        .webp({ quality: 42 })
+        .toBuffer()
+      variants[light ? 'lqipLight' : 'lqip'] = `data:image/webp;base64,${lqip.toString('base64')}`
     }
+    setLight(false)
 
-    // Tiny blur-up placeholder, inlined into the bundle.
-    const lqip = await sharp(svg, { density: 96 })
-      .resize(20, Math.round((20 / W) * H))
-      .blur(1.1)
-      .webp({ quality: 42 })
-      .toBuffer()
-
-    manifest.push({ id: plate.id, lqip: `data:image/webp;base64,${lqip.toString('base64')}` })
+    manifest.push({ id: plate.id, ...variants })
     process.stdout.write(`  ✓ ${plate.id}\n`)
   }
 
@@ -90,15 +106,18 @@ async function main() {
 
 export interface Plate {
   id: string
-  /** Inline blur-up placeholder shown until the real plate decodes. */
+  /** Inline blur-up placeholders, one per theme. */
   lqip: string
+  lqipLight: string
 }
 
 export const PLATE_WIDTHS = [${WIDTHS.join(', ')}] as const
 export const PLATE_RATIO = ${(W / H).toFixed(6)}
 
 export const PLATES: Record<string, Plate> = {
-${manifest.map((m) => `  '${m.id}': { id: '${m.id}', lqip: '${m.lqip}' },`).join('\n')}
+${manifest
+  .map((m) => `  '${m.id}': { id: '${m.id}', lqip: '${m.lqip}', lqipLight: '${m.lqipLight}' },`)
+  .join('\n')}
 }
 
 export type PlateId = keyof typeof PLATES

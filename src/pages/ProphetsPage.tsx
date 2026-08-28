@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { PROPHETS } from '../data/prophets'
@@ -98,9 +99,9 @@ export default function ProphetsPage() {
                   <span
                     className="relative block h-2.5 w-2.5 rotate-45 border"
                     style={{
-                      borderColor: p.accent,
-                      background: p.ululAzm ? p.accent : 'transparent',
-                      boxShadow: p.ululAzm ? `0 0 18px ${p.accent}` : 'none',
+                      borderColor: ac(p.accent),
+                      background: p.ululAzm ? ac(p.accent) : 'transparent',
+                      boxShadow: p.ululAzm ? `0 0 18px ${ac(p.accent)}` : 'none',
                     }}
                   />
                   <span className="mt-3 block text-center text-[0.62rem] tracking-[0.24em] text-ivory-dim/35 tabular-nums">
@@ -161,9 +162,9 @@ export default function ProphetsPage() {
                   aria-hidden="true"
                   className="absolute top-8 left-[1.05rem] block h-2.5 w-2.5 rotate-45 border"
                   style={{
-                    borderColor: p.accent,
-                    background: p.ululAzm ? p.accent : 'transparent',
-                    boxShadow: p.ululAzm ? `0 0 14px ${p.accent}` : 'none',
+                    borderColor: ac(p.accent),
+                    background: p.ululAzm ? ac(p.accent) : 'transparent',
+                    boxShadow: p.ululAzm ? `0 0 14px ${ac(p.accent)}` : 'none',
                   }}
                 />
                 <Reveal y={18} amount={0.15}>

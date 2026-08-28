@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useTransform, type MotionValue } from 'framer-motion'
 import { STORY_ENVIRONMENTS, YUSUF_STAGES, type StoryEnvironment } from '../data/journey'
@@ -7,7 +8,7 @@ import SceneArt from '../components/visuals/SceneArt'
 import ParticleField from '../components/visuals/ParticleField'
 import Plate from '../components/Plate'
 import { GeometricPattern } from '../components/visuals/GeometricPattern'
-import { Grain, Vignette } from '../components/ui'
+
 import {
   Beat,
   Eyebrow,
@@ -40,17 +41,16 @@ function StoryOpening() {
   return (
     <section
       aria-label="Enter their stories"
-      className="relative flex min-h-[70svh] w-full items-center justify-center overflow-hidden px-5 py-24"
+      className="cv-70 relative flex min-h-[70svh] w-full items-center justify-center overflow-hidden px-5 py-24"
     >
       <div aria-hidden="true" className="absolute inset-0">
         <div
           className="absolute inset-0"
-          style={{ background: 'radial-gradient(80% 60% at 50% 50%, rgba(16,28,51,.6), rgba(4,7,11,1) 72%)' }}
+          style={{ background: 'radial-gradient(80% 60% at 50% 50%, rgb(var(--navy-2-rgb) / .6), rgb(var(--ink-rgb) / 1) 72%)' }}
         />
         <GeometricPattern variant="khatam" opacity={0.045} scale={200} color="#d3ad68" />
         <ParticleField weather="stars" density={0.9} color="#e7cd9b" opacity={0.6} />
       </div>
-      <Vignette strength={0.82} />
       <div className="relative z-30 max-w-3xl text-center">
         <Eyebrow>Chapter Four</Eyebrow>
         <Statement size="lg" gilded className="mt-6">
@@ -86,16 +86,16 @@ function StoryEnvironmentScene({ story, order }: { story: StoryEnvironment; orde
         height={isMusa ? 420 : 320}
         label={`${p.name} ${p.honorific} — ${story.environment}`}
         backdrop={(prog, step) => (
-          <StoryBackdrop id={story.id} progress={prog} step={step} accent={p.accent} weather={p.weather} />
+          <StoryBackdrop id={story.id} progress={prog} step={step} accent={ac(p.accent)} weather={p.weather} />
         )}
         flat={
           <div className="relative overflow-hidden px-5 py-20">
             <div aria-hidden="true" className="absolute inset-0 -z-10 opacity-45">
-              <SceneArt art={story.id} progress={0.8} accent={p.accent} />
+              <SceneArt art={story.id} progress={0.8} accent={ac(p.accent)} />
             </div>
             <div className="absolute inset-0 -z-10 bg-ink/70" aria-hidden="true" />
             <div className="relative mx-auto max-w-3xl text-center">
-              <Eyebrow color={p.accent}>{story.environment}</Eyebrow>
+              <Eyebrow color={ac(p.accent)}>{story.environment}</Eyebrow>
               <h3 className="font-display mt-5 text-[clamp(2rem,7vw,4rem)] leading-none font-light uppercase">
                 {story.title} <span className="text-[0.3em] text-gold/60">{p.honorific}</span>
               </h3>
@@ -109,10 +109,10 @@ function StoryEnvironmentScene({ story, order }: { story: StoryEnvironment; orde
         {(prog) => (
           <>
             <Beat progress={prog} from={0} to={0.34}>
-              <Eyebrow color={p.accent}>
+              <Eyebrow color={ac(p.accent)}>
                 Scene {String(order + 1).padStart(2, '0')} · {story.environment}
               </Eyebrow>
-              <p className="font-arabic mt-7 text-3xl sm:text-5xl" style={{ color: p.accent }} lang="ar">
+              <p className="font-arabic mt-7 text-3xl sm:text-5xl" style={{ color: ac(p.accent) }} lang="ar">
                 {p.arabic}
               </p>
               <h3 className="font-display mt-4 text-[clamp(2.4rem,10vw,7rem)] leading-none font-light uppercase">
@@ -162,27 +162,25 @@ function StoryEnvironmentScene({ story, order }: { story: StoryEnvironment; orde
       {/* ── the reveals ──────────────────────────────────────────── */}
       <section
         aria-label={`What ${p.name} ${p.honorific} teaches`}
-        className="relative flex min-h-[80svh] w-full items-center justify-center overflow-hidden px-5 py-20"
+        className="cv-80 relative flex min-h-[80svh] w-full items-center justify-center overflow-hidden px-5 py-20"
       >
         <div aria-hidden="true" className="absolute inset-0">
           <Plate id={story.id} opacity={0.55} />
           <div className="absolute inset-0 opacity-55">
-            <SceneArt art={story.id} progress={0.9} accent={p.accent} />
+            <SceneArt art={story.id} progress={0.9} accent={ac(p.accent)} />
           </div>
           <div
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(to bottom, rgba(4,7,11,.72), rgba(4,7,11,.84) 50%, rgba(4,7,11,.96))',
+                'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.72 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.84 * var(--scrim-k))) 50%, rgb(var(--ink-rgb) / calc(.96 * var(--scrim-k))))',
             }}
           />
-          <ParticleField weather={p.weather} density={0.6} color={p.accent} opacity={0.4} />
+          <ParticleField weather={p.weather} density={0.6} color={ac(p.accent)} opacity={0.4} />
         </div>
-        <Vignette strength={0.8} />
-        <Grain opacity={0.03} />
 
         <div className="relative z-30 w-full max-w-4xl">
-          <p className="text-center text-[0.66rem] tracking-[0.4em] uppercase" style={{ color: `${p.accent}bb` }}>
+          <p className="text-center text-[0.66rem] tracking-[0.4em] uppercase" style={{ color: `${ac(p.accent)}bb` }}>
             {story.title} {p.honorific} · what it teaches
           </p>
 
@@ -202,10 +200,10 @@ function StoryEnvironmentScene({ story, order }: { story: StoryEnvironment; orde
                     aria-pressed={on}
                     className="group relative cursor-pointer border px-6 py-4 text-[0.7rem] tracking-[0.24em] uppercase transition-all duration-500"
                     style={{
-                      borderColor: on ? p.accent : `${p.accent}3a`,
-                      color: on ? '#f6e5bf' : `${p.accent}dd`,
-                      background: on ? `${p.accent}1c` : 'rgba(4,7,11,.5)',
-                      boxShadow: on ? `0 0 40px -10px ${p.accent}` : 'none',
+                      borderColor: on ? ac(p.accent) : `${ac(p.accent)}3a`,
+                      color: on ? 'var(--color-gold-bright)' : `${ac(p.accent)}dd`,
+                      background: on ? `${ac(p.accent)}1c` : 'rgb(var(--ink-rgb) / .5)',
+                      boxShadow: on ? `0 0 40px -10px ${ac(p.accent)}` : 'none',
                     }}
                   >
                     {r.title}
@@ -221,7 +219,7 @@ function StoryEnvironmentScene({ story, order }: { story: StoryEnvironment; orde
                 <InfoPanel
                   key={open}
                   title={story.reveals[open].title}
-                  accent={p.accent}
+                  accent={ac(p.accent)}
                   onClose={() => {
                     cue('close')
                     setOpen(null)
@@ -269,20 +267,18 @@ function StoryBackdrop({
     <div aria-hidden="true" className="absolute inset-0">
       <Plate id={id} opacity={0.9} />
       <motion.div className="absolute inset-0 opacity-85" style={{ scale, y }}>
-        <SceneArt art={id} progress={step / 40} accent={accent} />
+        <SceneArt art={id} progress={step / 14} accent={accent} />
       </motion.div>
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(to bottom, rgba(4,7,11,.5), rgba(4,7,11,.24) 38%, rgba(4,7,11,.86))',
+            'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.5 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.24 * var(--scrim-k))) 38%, rgb(var(--ink-rgb) / calc(.86 * var(--scrim-k))))',
         }}
       />
       <ParticleField weather={weather} density={0.85} color={accent} opacity={0.55} />
       <GeometricPattern variant="lattice" opacity={0.02} scale={140} color={accent} />
       <SceneVeil progress={progress} />
-      <Vignette strength={0.82} />
-      <Grain opacity={0.032} />
       <SceneRail progress={progress} accent={accent} />
     </div>
   )
@@ -363,26 +359,24 @@ function YusufJourney({ story, order }: { story: StoryEnvironment; order: number
           transition={{ duration: 1.2 }}
           className="absolute inset-0"
         >
-          <SceneArt art="yusuf" progress={artProgress} accent={p.accent} />
+          <SceneArt art="yusuf" progress={artProgress} accent={ac(p.accent)} />
         </motion.div>
         <div
           className="absolute inset-0"
           style={{
             background:
-              'linear-gradient(to bottom, rgba(4,7,11,.66), rgba(4,7,11,.5) 45%, rgba(4,7,11,.94))',
+              'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.66 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.5 * var(--scrim-k))) 45%, rgb(var(--ink-rgb) / calc(.94 * var(--scrim-k))))',
           }}
         />
-        <ParticleField weather="motes" density={0.7} color={p.accent} opacity={0.5} />
+        <ParticleField weather="motes" density={0.7} color={ac(p.accent)} opacity={0.5} />
       </div>
-      <Vignette strength={0.82} />
-      <Grain opacity={0.03} />
 
       <div className="relative z-30">
         <div className="mx-auto max-w-3xl px-5 text-center">
-          <Eyebrow color={p.accent}>
+          <Eyebrow color={ac(p.accent)}>
             Scene {String(order + 1).padStart(2, '0')} · {story.environment}
           </Eyebrow>
-          <p className="font-arabic mt-6 text-3xl sm:text-4xl" style={{ color: p.accent }} lang="ar">
+          <p className="font-arabic mt-6 text-3xl sm:text-4xl" style={{ color: ac(p.accent) }} lang="ar">
             {p.arabic}
           </p>
           <h3 className="font-display mt-3 text-[clamp(2.2rem,8vw,5rem)] leading-none font-light uppercase">
@@ -401,7 +395,7 @@ function YusufJourney({ story, order }: { story: StoryEnvironment; order: number
           <ol className="mx-auto mt-14 max-w-lg space-y-6 px-5">
             {YUSUF_STAGES.map((s, i) => (
               <li key={s.id}>
-                <StageCard stage={s} index={i} accent={p.accent} active />
+                <StageCard stage={s} index={i} accent={ac(p.accent)} active />
               </li>
             ))}
           </ol>
@@ -431,7 +425,7 @@ function YusufJourney({ story, order }: { story: StoryEnvironment; order: number
             >
               {YUSUF_STAGES.map((s, i) => (
                 <div key={s.id} className="w-[min(80vw,34rem)] shrink-0 snap-center">
-                  <StageCard stage={s} index={i} accent={p.accent} active={stage === i} />
+                  <StageCard stage={s} index={i} accent={ac(p.accent)} active={stage === i} />
                 </div>
               ))}
             </div>
@@ -451,8 +445,8 @@ function YusufJourney({ story, order }: { story: StoryEnvironment; order: number
                     className="block h-1.5 rounded-full transition-all duration-500"
                     style={{
                       width: stage === i ? '2rem' : '0.5rem',
-                      background: stage === i ? p.accent : 'rgba(185,177,163,.28)',
-                      boxShadow: stage === i ? `0 0 14px ${p.accent}` : 'none',
+                      background: stage === i ? ac(p.accent) : 'rgb(var(--ivory-dim-rgb) / .28)',
+                      boxShadow: stage === i ? `0 0 14px ${ac(p.accent)}` : 'none',
                     }}
                   />
                 </button>
@@ -470,7 +464,7 @@ function YusufJourney({ story, order }: { story: StoryEnvironment; order: number
             <li
               key={r.title}
               className="border px-4 py-2 text-[0.66rem] tracking-[0.22em] uppercase"
-              style={{ borderColor: `${p.accent}33`, color: `${p.accent}dd` }}
+              style={{ borderColor: `${ac(p.accent)}33`, color: `${ac(p.accent)}dd` }}
             >
               {r.title}
             </li>
@@ -496,8 +490,8 @@ function StageCard({
     <article
       className="relative h-full overflow-hidden border p-8 backdrop-blur-sm transition-all duration-700 sm:p-10"
       style={{
-        borderColor: active ? `${accent}66` : 'rgba(211,173,104,.14)',
-        background: active ? 'rgba(7,12,20,.82)' : 'rgba(7,12,20,.6)',
+        borderColor: active ? `${accent}66` : 'rgb(var(--gold-rgb) / .14)',
+        background: active ? 'rgb(var(--ink-2-rgb) / .82)' : 'rgb(var(--ink-2-rgb) / .6)',
         boxShadow: active ? `0 0 80px -30px ${accent}` : 'none',
       }}
     >

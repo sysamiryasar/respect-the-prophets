@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCanvas, rgbTriplet, seeded } from '../../lib/useCanvas'
 import { useJourney } from '../../lib/journey'
+import { ac, isLight } from '../../lib/art'
 
 export type Weather = 'stars' | 'rain' | 'sand' | 'dust' | 'embers' | 'motes'
 
@@ -31,15 +32,17 @@ interface P {
 
 /** Particles per 100k CSS px², tuned per variant so density feels even. */
 const BASE_DENSITY: Record<Weather, number> = {
-  stars: 16,
-  rain: 12,
-  sand: 20,
-  dust: 10,
-  embers: 7,
-  motes: 8,
+  stars: 9,
+  rain: 7,
+  sand: 11,
+  dust: 6,
+  embers: 4.5,
+  motes: 5,
 }
 
-const MAX_PARTICLES = 420
+/* Every particle is a drawImage of the glow sprite, so this number is a
+   direct per-frame cost multiplied by however many fields are on screen. */
+const MAX_PARTICLES = 200
 
 /**
  * One canvas, six behaviours. Kept deliberately cheap:
@@ -57,7 +60,23 @@ export default function ParticleField({
   speed = 1,
 }: Props) {
   const { reduced, compact } = useJourney()
-  const rgb = useMemo(() => rgbTriplet(color), [color])
+
+  /* A canvas is its own compositing layer whether or not it is drawing, and
+     the journey has more than twenty of them. Mount only the ones near the
+     viewport so the rest cost nothing at all. */
+  const hostRef = useRef<HTMLDivElement>(null)
+  const [near, setNear] = useState(false)
+  useEffect(() => {
+    const el = hostRef.current
+    if (!el) return
+    const io = new IntersectionObserver(([e]) => setNear(e.isIntersecting), {
+      rootMargin: '400px',
+    })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  const { theme } = useJourney()
+  const rgb = useMemo(() => rgbTriplet(ac(color)), [color, theme])
 
   const state = useMemo(
     () => ({ parts: [] as P[], sprite: null as HTMLCanvasElement | null }),
@@ -68,7 +87,7 @@ export default function ParticleField({
 
   const ref = useCanvas<HTMLCanvasElement>({
     still: reduced,
-    deps: [weather, color, density, compact, speed, opacity],
+    deps: [weather, color, density, compact, speed, opacity, theme, near],
     setup: ({ w, h }) => {
       const rand = seeded(Math.round(w * 31 + h * 17 + weather.length * 7919))
       const area = (w * h) / 100_000
@@ -178,7 +197,8 @@ export default function ParticleField({
       const parts = state.parts
       const sprite = state.sprite
       ctx.globalAlpha = 1
-      ctx.globalCompositeOperation = 'lighter'
+      // 'lighter' adds light — on parchment the motes must subtract it.
+      ctx.globalCompositeOperation = isLight() ? 'multiply' : 'lighter'
 
       const step = reduced ? 0 : dt * speed
 
@@ -262,10 +282,12 @@ export default function ParticleField({
   })
 
   return (
-    <canvas
-      ref={ref}
+    <div
+      ref={hostRef}
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
-    />
+      className={`pointer-events-none absolute inset-0 ${className}`}
+    >
+      {near && <canvas ref={ref} className="absolute inset-0 h-full w-full" />}
+    </div>
   )
 }

@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -44,7 +45,7 @@ export default function ConstellationPage() {
                   y1={p.star.y}
                   x2={CORE.x}
                   y2={CORE.y}
-                  stroke={on ? p.accent : '#d3ad68'}
+                  stroke={on ? ac(p.accent) : 'var(--color-gold)'}
                   strokeWidth={on ? 1 : 0.6}
                   vectorEffect="non-scaling-stroke"
                   strokeOpacity={sel ? (on ? 0.8 : 0.05) : 0.14}
@@ -90,7 +91,7 @@ export default function ConstellationPage() {
             <span
               aria-hidden="true"
               className="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl sm:h-36 sm:w-36"
-              style={{ background: 'radial-gradient(circle, rgba(246,229,191,.5), transparent 70%)' }}
+              style={{ background: 'radial-gradient(circle, rgb(var(--gold-bright-rgb) / .5), transparent 70%)' }}
             />
             {!reduced && (
               <span
@@ -98,7 +99,7 @@ export default function ConstellationPage() {
                 className="anim-pulse-ring absolute top-1/2 left-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-gold/50"
               />
             )}
-            <span className="relative block h-3 w-3 translate-x-[calc(50%-0.375rem)] rounded-full bg-gold-bright shadow-[0_0_28px_6px_rgba(246,229,191,.6)]" />
+            <span className="relative block h-3 w-3 translate-x-[calc(50%-0.375rem)] rounded-full bg-gold-bright shadow-[0_0_28px_6px_rgb(var(--gold-bright-rgb) / .6)]" />
             <span
               className="font-arabic relative mt-4 block text-lg whitespace-nowrap text-gold-soft sm:text-2xl"
               lang="ar"
@@ -151,7 +152,7 @@ export default function ConstellationPage() {
                   style={{
                     width: `${p.star.mag * 22}px`,
                     height: `${p.star.mag * 22}px`,
-                    background: `radial-gradient(circle, ${p.accent}88, transparent 70%)`,
+                    background: `radial-gradient(circle, ${ac(p.accent)}88, transparent 70%)`,
                   }}
                 />
                 <span
@@ -159,8 +160,8 @@ export default function ConstellationPage() {
                   style={{
                     width: `${p.star.mag * 5}px`,
                     height: `${p.star.mag * 5}px`,
-                    background: p.accent,
-                    boxShadow: `0 0 ${p.star.mag * 10}px ${p.accent}`,
+                    background: ac(p.accent),
+                    boxShadow: `0 0 ${p.star.mag * 10}px ${ac(p.accent)}`,
                   }}
                 />
                 <span
@@ -197,7 +198,7 @@ export default function ConstellationPage() {
                   aria-hidden="true"
                   className="absolute top-0 left-0 h-px w-full"
                   style={{
-                    background: `linear-gradient(90deg, transparent, ${active.accent}, transparent)`,
+                    background: `linear-gradient(90deg, transparent, ${ac(active.accent)}, transparent)`,
                   }}
                 />
                 <div className="flex items-start justify-between gap-4">
@@ -206,11 +207,11 @@ export default function ConstellationPage() {
                       {active.name}
                       <span className="ml-2 text-sm text-gold/60">{active.honorific}</span>
                     </h2>
-                    <p className="font-arabic mt-1 text-xl" style={{ color: active.accent }} lang="ar">
+                    <p className="font-arabic mt-1 text-xl" style={{ color: ac(active.accent) }} lang="ar">
                       {active.arabic}
                     </p>
                   </div>
-                  <ProphetGlyph id={active.id} className="h-9 w-9 shrink-0" color={active.accent} />
+                  <ProphetGlyph id={active.id} className="h-9 w-9 shrink-0" color={ac(active.accent)} />
                 </div>
 
                 <div className="hairline my-6 h-px w-full" aria-hidden="true" />
@@ -221,7 +222,7 @@ export default function ConstellationPage() {
                     <li
                       key={t}
                       className="border px-2.5 py-1 text-[0.64rem] tracking-[0.18em] uppercase"
-                      style={{ borderColor: `${active.accent}33`, color: `${active.accent}cc` }}
+                      style={{ borderColor: `${ac(active.accent)}33`, color: `${ac(active.accent)}cc` }}
                     >
                       {t}
                     </li>

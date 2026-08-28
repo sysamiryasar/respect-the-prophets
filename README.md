@@ -205,6 +205,75 @@ The particle system is deliberately cheap: glow comes from a single pre-rendered
 sprite rather than `shadowBlur`, counts scale to viewport area and halve on small
 screens, and every canvas pauses when scrolled out of view or when the tab is hidden.
 
+## Themes
+
+Two complete art directions, toggled from the header (☀/☾) and remembered per
+visitor; the first visit follows `prefers-color-scheme`.
+
+The dark theme is the source of truth — every accent, sky and silhouette is
+authored for night. The light theme re-reads those same values through the
+transforms in [`lib/art.ts`](src/lib/art.ts), so there is one palette to
+maintain rather than two:
+
+| transform | what it does on parchment |
+|---|---|
+| `ac()` | drives an accent down to a readable version of the same hue |
+| `sky()` | turns a night sky into a pale wash — Musa stays cool, Ibrahim warm |
+| `ground()` | keeps terrain sand-toned, since near-black type sits on it |
+| `sil()` | keeps architecture dark, so the Ka'bah still reads as a silhouette |
+
+Each forces an exact lightness rather than scaling it, which makes them
+idempotent — safe to apply anywhere in the tree. Colours are biased toward
+paper on the way, because raising the lightness of a blue-black palette
+otherwise gives you cold lavender on a warm ground.
+
+Tailwind v4 compiles theme values to CSS variables, so redefining them under
+`html[data-theme="light"]` re-skins every `bg-ink`/`text-ivory` at once. The
+token names are **roles**: `ink` is always the page ground, `ivory` always the
+primary text, and the two simply trade places.
+
+Every plate is rasterised twice, and `Plate` picks the right one.
+
+## Performance
+
+```bash
+node scripts/perf.mjs --url http://localhost:5179/ --cpu 4          # desktop
+node scripts/perf.mjs --url http://localhost:5179/ --cpu 6 --mobile
+```
+
+Scroll was measurably janky — 100 ms median frames at 4× CPU throttle. What
+fixed it, in order of effect:
+
+- **Scroll progress moved from React state to a MotionValue.** It changed 60×
+  a second, which changed the context value, which re-rendered the entire
+  journey on every frame.
+- **The nav stopped measuring eleven elements per scroll frame** to find the
+  active section — that was forcing synchronous layout the whole way down.
+  It uses an IntersectionObserver now.
+- **`content-visibility`** so the browser skips styling, layout and paint for
+  scenes that are nowhere near the viewport. Placeholder sizes are matched per
+  section height, or the page grows and shrinks as you scroll.
+- **Canvases mount only near the viewport.** Each is its own compositing layer
+  whether or not it is drawing; the page went from 23 live canvases to 3.
+- **One shared rAF** drives every canvas instead of one loop each.
+- **Blur pulled back on display type** (16px → 5px, none on touch) — blurring
+  8rem text re-rasterises it every frame.
+- One grain and one vignette for the page instead of 31 full-viewport layers.
+
+Result at 4× throttle: median 100 → 50 ms, worst frame 233 → 100 ms, long
+frames 284 → 105. Mobile at 6× throttle sits at 33 ms with 20 long frames.
+
+## Responsive
+
+```bash
+node scripts/responsive.mjs --url http://localhost:5179/
+```
+
+Loads the journey at eight real device widths in both themes and walks the
+whole page at each, checking horizontal overflow, elements escaping their
+container, text clipped inside its own box, sub-28px tap targets, and console
+errors. Currently **16/16 clean**.
+
 ## Visual QA
 
 ```bash

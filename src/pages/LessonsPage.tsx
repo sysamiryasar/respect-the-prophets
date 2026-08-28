@@ -59,7 +59,7 @@ export default function LessonsPage() {
                 className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
                 style={{
                   background:
-                    'radial-gradient(120% 80% at 50% 100%, rgba(211,173,104,.14), transparent 65%)',
+                    'radial-gradient(120% 80% at 50% 100%, rgb(var(--gold-rgb) / .14), transparent 65%)',
                 }}
               />
               <span

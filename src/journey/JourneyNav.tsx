@@ -23,40 +23,32 @@ export default function JourneyNav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  /* Which named scene owns the middle of the viewport. */
+  /* Which named scene owns the middle of the viewport.
+     An IntersectionObserver rather than measuring eleven elements on every
+     scroll frame — that loop was forcing synchronous layout the whole way
+     down the page. */
   useEffect(() => {
     const nodes = JOURNEY_NAV.map((s) => document.getElementById(s.id)).filter(
       (el): el is HTMLElement => Boolean(el),
     )
     if (!nodes.length) return
 
-    let frame = 0
-    const update = () => {
-      frame = 0
-      const mid = window.innerHeight / 2
-      let best = 0
-      let bestTop = -Infinity
-      nodes.forEach((el, i) => {
-        const r = el.getBoundingClientRect()
-        // the last scene whose top has passed the middle of the screen
-        if (r.top <= mid && r.top > bestTop) {
-          bestTop = r.top
-          best = i
+    const visible = new Set<number>()
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          const i = nodes.indexOf(e.target as HTMLElement)
+          if (i < 0) continue
+          if (e.isIntersecting) visible.add(i)
+          else visible.delete(i)
         }
-      })
-      setActive(best)
-    }
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll, { passive: true })
-    return () => {
-      if (frame) cancelAnimationFrame(frame)
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
-    }
+        if (visible.size) setActive(Math.max(...visible))
+      },
+      // a thin band across the middle of the screen
+      { rootMargin: '-45% 0px -45% 0px', threshold: 0 },
+    )
+    nodes.forEach((el) => io.observe(el))
+    return () => io.disconnect()
   }, [])
 
   useEffect(() => {
@@ -85,9 +77,9 @@ export default function JourneyNav() {
     <>
       {/* continuous progress through the whole journey */}
       <div aria-hidden="true" className="fixed inset-x-0 top-0 z-[70] h-[2px] bg-gold/8">
-        <div
+        <motion.div
           className="h-full origin-left bg-gradient-to-r from-bronze via-gold to-gold-bright"
-          style={{ transform: `scaleX(${progress})`, transformOrigin: 'left' }}
+          style={{ scaleX: progress }}
         />
       </div>
 
@@ -124,7 +116,7 @@ export default function JourneyNav() {
               </button>
 
               {/* the chapter chain */}
-              <ol className="hidden items-center gap-0.5 lg:flex">
+              <ol className="hidden items-center gap-0.5 xl:flex">
                 {JOURNEY_NAV.map((s, i) => {
                   const on = i === active
                   const done = i < active
@@ -164,7 +156,7 @@ export default function JourneyNav() {
               </ol>
 
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden items-center gap-2 md:flex" aria-label={`Section ${step} of ${total}`}>
+                <div className="hidden items-center gap-2 xl:flex" aria-label={`Section ${step} of ${total}`}>
                   <span className="font-display text-[0.64rem] text-gold tabular-nums">{step}</span>
                   <span aria-hidden="true" className="relative block h-px w-12 bg-gold/15">
                     <span
@@ -186,7 +178,7 @@ export default function JourneyNav() {
                   data-cursor="hover"
                   aria-label="Open the section menu"
                   aria-expanded={menuOpen}
-                  className="flex h-9 w-9 cursor-pointer items-center justify-center border border-gold/20 text-gold/70 transition-colors hover:border-gold/60 hover:text-gold-bright lg:hidden"
+                  className="flex h-9 w-9 cursor-pointer items-center justify-center border border-gold/20 text-gold/70 transition-colors hover:border-gold/60 hover:text-gold-bright xl:hidden"
                 >
                   <Menu size={16} strokeWidth={1.5} />
                 </button>
@@ -204,7 +196,7 @@ export default function JourneyNav() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: reduced ? 0 : 0.3 }}
-            className="fixed inset-0 z-[75] lg:hidden"
+            className="fixed inset-0 z-[75] xl:hidden"
             role="dialog"
             aria-modal="true"
             aria-label="Journey sections"

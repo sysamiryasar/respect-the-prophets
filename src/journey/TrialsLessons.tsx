@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { TRIALS, WHEEL } from '../data/journey'
@@ -6,7 +7,7 @@ import SceneArt from '../components/visuals/SceneArt'
 import ParticleField from '../components/visuals/ParticleField'
 import Plate from '../components/Plate'
 import { GeometricPattern, Rosette } from '../components/visuals/GeometricPattern'
-import { Grain, Vignette } from '../components/ui'
+
 import { Eyebrow, Statement, useRevealOnSelect } from './kit'
 
 /* ================================================================== */
@@ -23,12 +24,12 @@ export function TrialsScene() {
       id="trials"
       data-scene="trials"
       aria-label="The trials"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-24"
+      className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-24"
     >
       <div aria-hidden="true" className="absolute inset-0">
         <div
           className="absolute inset-0"
-          style={{ background: 'radial-gradient(90% 65% at 50% 50%, rgba(9,12,20,.9), rgba(3,5,8,1) 74%)' }}
+          style={{ background: 'radial-gradient(90% 65% at 50% 50%, rgb(var(--ink-2-rgb) / .9), rgb(var(--ink-rgb) / 1) 74%)' }}
         />
         <AnimatePresence>
           {active && (
@@ -52,8 +53,6 @@ export function TrialsScene() {
         />
         <GeometricPattern variant="lattice" opacity={0.025} scale={120} color="#8b6a42" />
       </div>
-      <Vignette strength={0.9} />
-      <Grain opacity={0.035} />
 
       <div className="relative z-30 w-full max-w-6xl">
         <div className="text-center">
@@ -91,8 +90,8 @@ export function TrialsScene() {
                   aria-label={`${t.element} — ${t.prophet}, ${t.quality}`}
                   className="group relative block h-full w-full cursor-pointer overflow-hidden border text-left transition-all duration-700"
                   style={{
-                    borderColor: on ? `${t.accent}88` : 'rgba(211,173,104,.14)',
-                    boxShadow: on ? `0 0 90px -32px ${t.accent}` : 'none',
+                    borderColor: on ? `${ac(t.accent)}88` : 'rgb(var(--gold-rgb) / .14)',
+                    boxShadow: on ? `0 0 90px -32px ${ac(t.accent)}` : 'none',
                   }}
                 >
                   <span className="relative block aspect-[4/3] w-full overflow-hidden">
@@ -101,26 +100,27 @@ export function TrialsScene() {
                       className="absolute inset-0 transition-transform duration-[1400ms] ease-[cubic-bezier(.16,1,.3,1)] group-hover:scale-[1.08]"
                       style={{ transform: on ? 'scale(1.08)' : undefined }}
                     >
-                      <SceneArt art={t.id} progress={on ? 0.95 : 0.35} accent={t.accent} />
+                      <Plate id={t.id} opacity={0.8} sizes="(max-width: 767px) 92vw, 30vw" />
+                      <SceneArt art={t.id} progress={on ? 0.95 : 0.35} accent={ac(t.accent)} />
                     </span>
                     <span
                       aria-hidden="true"
                       className="absolute inset-0 transition-opacity duration-700"
                       style={{
-                        background: `linear-gradient(to bottom, rgba(4,7,11,.3), rgba(4,7,11,.72) 55%, rgba(4,7,11,.95))`,
+                        background: `linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.3 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.72 * var(--scrim-k))) 55%, rgb(var(--ink-rgb) / calc(.95 * var(--scrim-k))))`,
                         opacity: on ? 0.85 : 1,
                       }}
                     />
                     <span className="absolute right-5 bottom-4 left-5">
                       <span
                         className="font-display block text-[clamp(1.8rem,4vw,2.8rem)] leading-none font-light uppercase transition-colors duration-500"
-                        style={{ color: on ? '#f6e5bf' : '#ece4d5' }}
+                        style={{ color: on ? 'var(--color-gold-bright)' : 'var(--color-ivory)' }}
                       >
                         {t.element}
                       </span>
                       <span
                         className="mt-2 block text-[0.66rem] tracking-[0.28em] uppercase"
-                        style={{ color: `${t.accent}cc` }}
+                        style={{ color: `${ac(t.accent)}cc` }}
                       >
                         {t.prophet} · {t.quality}
                       </span>
@@ -181,18 +181,17 @@ export function LessonsScene() {
       id="lessons"
       data-scene="lessons"
       aria-label="What can we learn"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-24"
+      className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-24"
     >
       <div aria-hidden="true" className="absolute inset-0">
         <div
           className="absolute inset-0"
-          style={{ background: 'radial-gradient(80% 62% at 50% 48%, rgba(11,28,34,.62), rgba(4,7,11,1) 74%)' }}
+          style={{ background: 'radial-gradient(80% 62% at 50% 48%, rgb(var(--emerald-rgb) / .62), rgb(var(--ink-rgb) / 1) 74%)' }}
         />
+        <Plate id="ch-lessons" opacity={0.42} />
         <GeometricPattern variant="khatam" opacity={0.04} scale={165} color="#8ec6a8" drift={!reduced} />
         <ParticleField weather="motes" density={0.65} color="#8ec6a8" opacity={0.45} />
       </div>
-      <Vignette strength={0.85} />
-      <Grain opacity={0.03} />
 
       <div className="relative z-30 w-full max-w-6xl">
         <div className="text-center">
@@ -262,9 +261,9 @@ export function LessonsScene() {
                       <span
                         className="relative flex h-[clamp(2.6rem,8vw,3.6rem)] w-[clamp(2.6rem,8vw,3.6rem)] items-center justify-center rounded-full border backdrop-blur-sm transition-all duration-500"
                         style={{
-                          borderColor: on ? '#f6e5bf' : 'rgba(211,173,104,.3)',
-                          background: on ? 'rgba(211,173,104,.16)' : 'rgba(4,7,11,.8)',
-                          boxShadow: on ? '0 0 44px -6px rgba(211,173,104,.75)' : 'none',
+                          borderColor: on ? 'var(--color-gold)' : 'rgb(var(--gold-rgb) / .3)',
+                          background: on ? 'rgb(var(--gold-rgb) / .16)' : 'rgb(var(--ink-rgb) / .8)',
+                          boxShadow: on ? '0 0 44px -6px rgb(var(--gold-rgb) / .75)' : 'none',
                         }}
                       >
                         <span className="font-arabic text-[0.8rem] text-gold-soft sm:text-sm" lang="ar">
@@ -289,7 +288,7 @@ export function LessonsScene() {
               <span
                 aria-hidden="true"
                 className="absolute top-1/2 left-1/2 h-24 w-24 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
-                style={{ background: 'radial-gradient(circle, rgba(246,229,191,.35), transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, rgb(var(--gold-bright-rgb) / .35), transparent 70%)' }}
               />
               <p className="font-display text-gilded relative text-xl tracking-[0.26em] uppercase sm:text-2xl">
                 Character

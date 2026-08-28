@@ -1,3 +1,5 @@
+import { useMotionValue, type MotionValue } from 'framer-motion'
+import { setArtMode } from './art'
 import {
   createContext,
   useCallback,
@@ -10,8 +12,14 @@ import {
 } from 'react'
 
 type MotionPref = 'full' | 'reduced'
+type Theme = 'dark' | 'light'
 
 interface JourneyState {
+  /** Parchment or night. Mirrored onto <html data-theme> for CSS. */
+  theme: Theme
+  setTheme: (t: Theme) => void
+  toggleTheme: () => void
+
   /** True when animation should be damped — either OS preference or user toggle. */
   reduced: boolean
   motionPref: MotionPref
@@ -28,8 +36,14 @@ interface JourneyState {
   activeIndex: number
   setActiveIndex: (i: number) => void
 
-  /** 0–1 progress through the whole document. */
-  progress: number
+  /**
+   * 0–1 progress through the whole document.
+   *
+   * A MotionValue, not state, on purpose: this changes on every scroll
+   * frame, and holding it in state meant the context value changed 60x a
+   * second and re-rendered the entire journey with it.
+   */
+  progress: MotionValue<number>
 
   /** True once the user has passed the hero gate. */
   entered: boolean
@@ -45,6 +59,14 @@ interface JourneyState {
 export type CueKind = 'hover' | 'select' | 'open' | 'close' | 'reveal'
 
 const JourneyContext = createContext<JourneyState | null>(null)
+
+function readInitialTheme(): Theme {
+  if (typeof window === 'undefined') return 'light'
+  const stored = window.localStorage.getItem('rtp:theme')
+  if (stored === 'dark' || stored === 'light') return stored
+  // The experience is authored light-first; honour an explicit OS preference.
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
 
 function readInitialMotion(): MotionPref {
   if (typeof window === 'undefined') return 'full'
@@ -68,16 +90,30 @@ function useMediaQuery(query: string, initial = false) {
 }
 
 export function JourneyProvider({ children }: { children: ReactNode }) {
+  const [theme, setThemeState] = useState<Theme>(readInitialTheme)
   const [motionPref, setMotionPrefState] = useState<MotionPref>(readInitialMotion)
   const [soundOn, setSoundOn] = useState(false)
   const [activeIndex, setActiveIndex] = useState(0)
-  const [progress, setProgress] = useState(0)
+  const progress = useMotionValue(0)
   const [entered, setEntered] = useState(false)
 
   const coarse = useMediaQuery('(hover: none), (pointer: coarse)')
   const compact = useMediaQuery('(max-width: 767px)')
 
   const reduced = motionPref === 'reduced'
+
+  /* --- theme drives both CSS tokens and the generated artwork -------- */
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    window.localStorage.setItem('rtp:theme', theme)
+    setArtMode(theme)
+  }, [theme])
+
+  const setTheme = useCallback((t: Theme) => setThemeState(t), [])
+  const toggleTheme = useCallback(
+    () => setThemeState((t) => (t === 'dark' ? 'light' : 'dark')),
+    [],
+  )
 
   /* --- motion preference is mirrored onto <html> so CSS can react ---- */
   useEffect(() => {
@@ -98,7 +134,7 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
       frame = 0
       const doc = document.documentElement
       const max = doc.scrollHeight - window.innerHeight
-      setProgress(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0)
+      progress.set(max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0)
     }
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update)
@@ -111,6 +147,7 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   /* --- audio: a tiny synthesised ambience, built only on demand ------ */
@@ -148,6 +185,9 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<JourneyState>(
     () => ({
+      theme,
+      setTheme,
+      toggleTheme,
       reduced,
       motionPref,
       setMotionPref,
@@ -165,6 +205,9 @@ export function JourneyProvider({ children }: { children: ReactNode }) {
       compact,
     }),
     [
+      theme,
+      setTheme,
+      toggleTheme,
       reduced,
       motionPref,
       setMotionPref,

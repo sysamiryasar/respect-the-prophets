@@ -261,7 +261,7 @@ export function GoldButton({
       <span
         aria-hidden="true"
         className="absolute -inset-6 opacity-0 blur-2xl transition-opacity duration-700 group-hover:opacity-100"
-        style={{ background: 'radial-gradient(circle, rgba(211,173,104,.28), transparent 65%)' }}
+        style={{ background: 'radial-gradient(circle, rgb(var(--gold-rgb) / .28), transparent 65%)' }}
       />
       {/* corner ticks */}
       {variant === 'ghost' && (
@@ -304,7 +304,7 @@ export function Vignette({ strength = 0.8 }: { strength?: number }) {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-10"
       style={{
-        background: `radial-gradient(120% 90% at 50% 45%, transparent 35%, rgba(2,4,7,${strength * 0.55}) 78%, rgba(2,4,7,${strength}) 100%)`,
+        background: `radial-gradient(120% 90% at 50% 45%, transparent 35%, rgb(var(--ink-rgb) / ${strength * 0.55}) 78%, rgb(var(--ink-rgb) / ${strength}) 100%)`,
       }}
     />
   )

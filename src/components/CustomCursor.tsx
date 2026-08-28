@@ -88,8 +88,8 @@ export default function CustomCursor() {
           width: ringSize,
           height: ringSize,
           opacity: visible ? (mode === 'idle' ? 0.45 : 0.95) : 0,
-          borderColor: mode === 'idle' ? 'rgba(211,173,104,.5)' : 'rgba(246,229,191,.9)',
-          background: mode === 'explore' ? 'rgba(211,173,104,.07)' : 'transparent',
+          borderColor: mode === 'idle' ? 'rgb(var(--gold-rgb) / .5)' : 'rgb(var(--gold-bright-rgb) / .9)',
+          background: mode === 'explore' ? 'rgb(var(--gold-rgb) / .07)' : 'transparent',
         }}
       >
         <span

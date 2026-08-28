@@ -211,7 +211,7 @@ export default function QuranPage() {
                 className="my-6 h-px w-full"
                 style={{
                   background:
-                    'linear-gradient(90deg, transparent, rgba(110,231,183,.28), transparent)',
+                    'linear-gradient(90deg, transparent, rgb(var(--emerald-rgb) / .28), transparent)',
                 }}
               />
               <blockquote className="font-display text-[0.98rem] leading-relaxed font-light text-ivory/80 italic">

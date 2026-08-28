@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { SCENE_ORDER, PROPHET_BY_ID } from '../data/prophets'
@@ -47,21 +48,21 @@ export default function StoriesPage() {
                     className="absolute inset-0"
                     style={{
                       background:
-                        'linear-gradient(to bottom, rgba(4,7,11,.15), rgba(4,7,11,.55) 55%, rgba(4,7,11,.92))',
+                        'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.15 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.55 * var(--scrim-k))) 55%, rgb(var(--ink-rgb) / calc(.92 * var(--scrim-k))))',
                     }}
                   />
                   <span
                     aria-hidden="true"
                     className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100"
                     style={{
-                      background: `radial-gradient(80% 60% at 50% 80%, ${p.accent}26, transparent 70%)`,
+                      background: `radial-gradient(80% 60% at 50% 80%, ${ac(p.accent)}26, transparent 70%)`,
                     }}
                   />
 
                   <span className="absolute top-5 left-5 flex items-center gap-3">
                     <span
                       className="font-display text-[0.62rem] tracking-[0.34em] tabular-nums"
-                      style={{ color: p.accent }}
+                      style={{ color: ac(p.accent) }}
                     >
                       Scene {String(i + 1).padStart(2, '0')}
                     </span>
@@ -70,15 +71,15 @@ export default function StoriesPage() {
                   <span
                     className="absolute top-4 right-4 flex h-11 w-11 items-center justify-center rounded-full border transition-transform duration-700 group-hover:scale-110"
                     style={{
-                      borderColor: `${p.accent}44`,
-                      background: `radial-gradient(circle, ${p.accent}1f, transparent 70%)`,
+                      borderColor: `${ac(p.accent)}44`,
+                      background: `radial-gradient(circle, ${ac(p.accent)}1f, transparent 70%)`,
                     }}
                   >
-                    <ProphetGlyph id={id} className="h-5 w-5" color={p.accent} />
+                    <ProphetGlyph id={id} className="h-5 w-5" color={ac(p.accent)} />
                   </span>
 
                   <span className="absolute right-5 bottom-4 left-5">
-                    <span className="font-arabic block text-lg" style={{ color: `${p.accent}cc` }} lang="ar">
+                    <span className="font-arabic block text-lg" style={{ color: `${ac(p.accent)}cc` }} lang="ar">
                       {p.arabic}
                     </span>
                     <span className="font-display mt-1 block text-3xl leading-none font-light text-ivory uppercase">
@@ -95,10 +96,10 @@ export default function StoriesPage() {
                     aria-hidden="true"
                     className="absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:w-full"
                     style={{
-                      background: `linear-gradient(90deg, transparent, ${p.accent}, transparent)`,
+                      background: `linear-gradient(90deg, transparent, ${ac(p.accent)}, transparent)`,
                     }}
                   />
-                  <p className="text-[0.64rem] tracking-[0.28em] uppercase" style={{ color: `${p.accent}aa` }}>
+                  <p className="text-[0.64rem] tracking-[0.28em] uppercase" style={{ color: `${ac(p.accent)}aa` }}>
                     {scene.kicker}
                   </p>
                   <p className="font-display mt-3 text-[1.02rem] leading-relaxed text-ivory/80 italic">

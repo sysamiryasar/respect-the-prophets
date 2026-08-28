@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion'
 import { useJourney } from '../lib/journey'
@@ -41,15 +42,18 @@ export function Scene({
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
 
-  // Quantised so SVG-heavy backdrops re-render ~40x per scene, not per frame.
+  /* Quantised so SVG-heavy backdrops reconcile a handful of times per
+     scene rather than every frame. 40 steps looked no better than 14 and
+     cost roughly three times the React work while scrolling. */
+  const STEPS = 14
   const [step, setStep] = useState(0)
   useEffect(() => {
     if (reduced) {
-      setStep(30)
+      setStep(Math.round(STEPS * 0.75))
       return
     }
     return scrollYProgress.on('change', (v) => {
-      const q = Math.round(v * 40)
+      const q = Math.round(v * STEPS)
       setStep((cur) => (cur === q ? cur : q))
     })
   }, [scrollYProgress, reduced])
@@ -68,7 +72,7 @@ export function Scene({
       id={id}
       data-scene={id}
       aria-label={label}
-      className={`relative ${className}`}
+      className={`cv relative ${className}`}
       style={{ height: `${height}svh` }}
     >
       <div className="sticky top-0 h-[100svh] w-full overflow-hidden">
@@ -105,18 +109,23 @@ export function Beat({
   hold?: boolean
   live?: boolean
 }) {
+  const { coarse } = useJourney()
   const pad = (to - from) * 0.28
   const stops = [from, from + pad, to - pad, to]
   const opacity = useTransform(progress, stops, [0, 1, 1, hold ? 1 : 0])
   const y = useTransform(progress, stops, [46, 0, 0, hold ? 0 : -46])
-  const blurN = useTransform(progress, stops, [16, 0, 0, hold ? 0 : 16])
-  const filter = useTransform(blurN, (b) => `blur(${b.toFixed(2)}px)`)
   const scale = useTransform(progress, stops, [0.96, 1, 1, hold ? 1 : 1.03])
+
+  /* Blurring display-sized type re-rasterises it every frame, which was the
+     largest single cost while scrolling. A short 5px ramp keeps the soft
+     focus-pull; touch devices skip it entirely. */
+  const blurN = useTransform(progress, stops, [5, 0, 0, hold ? 0 : 5])
+  const filter = useTransform(blurN, (b) => (b < 0.2 ? 'none' : `blur(${b.toFixed(1)}px)`))
 
   return (
     <motion.div
       className={`absolute max-w-5xl px-2 text-center ${live ? '' : 'pointer-events-none'} ${className}`}
-      style={{ opacity, y, filter, scale }}
+      style={coarse ? { opacity, y, scale } : { opacity, y, filter, scale }}
     >
       {children}
     </motion.div>
@@ -157,7 +166,7 @@ export function Statement({
 /** Small caps eyebrow. */
 export function Eyebrow({
   children,
-  color = '#d3ad68',
+  color = ac('#d3ad68'),
   className = '',
 }: {
   children: ReactNode
@@ -229,14 +238,14 @@ export function Hotspot({
         style={{
           width: dot * 4,
           height: dot * 4,
-          background: `radial-gradient(circle, ${accent}99, transparent 70%)`,
+          background: `radial-gradient(circle, ${ac(accent)}99, transparent 70%)`,
         }}
       />
       {!reduced && (
         <span
           aria-hidden="true"
           className="anim-pulse-ring absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
-          style={{ width: dot * 2.6, height: dot * 2.6, borderColor: `${accent}66` }}
+          style={{ width: dot * 2.6, height: dot * 2.6, borderColor: `${ac(accent)}66` }}
         />
       )}
       <span
@@ -244,14 +253,14 @@ export function Hotspot({
         style={{
           width: dot,
           height: dot,
-          background: active ? '#f6e5bf' : accent,
-          boxShadow: `0 0 ${dot * 1.6}px ${accent}`,
+          background: active ? 'var(--color-gold-bright)' : ac(accent),
+          boxShadow: `0 0 ${dot * 1.6}px ${ac(accent)}`,
         }}
       />
       {index && (
         <span
           className="pointer-events-none mt-3 text-[0.62rem] tracking-[0.3em] tabular-nums"
-          style={{ color: `${accent}99` }}
+          style={{ color: `${ac(accent)}99` }}
         >
           {index}
         </span>
@@ -305,7 +314,7 @@ export function InfoPanel({
       <span
         aria-hidden="true"
         className="absolute top-0 left-0 h-px w-full"
-        style={{ background: `linear-gradient(90deg, transparent, ${accent}, transparent)` }}
+        style={{ background: `linear-gradient(90deg, transparent, ${ac(accent)}, transparent)` }}
       />
       <div className="flex items-baseline justify-between gap-4">
         <h3 className="font-display text-2xl font-light sm:text-3xl" style={{ color: accent }}>
@@ -375,7 +384,7 @@ export function useRevealOnSelect(ref: React.RefObject<HTMLElement | null>, key:
 export function SceneRail({ progress, accent }: { progress: MotionValue<number>; accent: string }) {
   return (
     <div aria-hidden="true" className="absolute bottom-0 left-0 z-20 h-px w-full bg-ivory/5">
-      <motion.div className="h-full origin-left" style={{ scaleX: progress, background: accent }} />
+      <motion.div className="h-full origin-left" style={{ scaleX: progress, background: ac(accent) }} />
     </div>
   )
 }

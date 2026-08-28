@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -57,7 +58,7 @@ export default function HomePage() {
             transition={{ duration: 3.4, ease: [0.16, 1, 0.3, 1] }}
             style={{
               background:
-                'radial-gradient(circle, rgba(211,173,104,.18) 0%, rgba(139,106,66,.09) 26%, rgba(10,17,32,.3) 52%, rgba(4,7,11,0) 72%)',
+                'radial-gradient(circle, rgb(var(--gold-rgb) / .18) 0%, rgb(var(--bronze-rgb) / .09) 26%, rgb(var(--navy-rgb) / .3) 52%, rgb(var(--ink-rgb) / 0) 72%)',
             }}
           />
 
@@ -196,7 +197,7 @@ export default function HomePage() {
             className="absolute inset-0"
             style={{
               background:
-                'radial-gradient(90% 60% at 50% 0%, rgba(10,17,32,.9), rgba(4,7,11,1) 65%)',
+                'radial-gradient(90% 60% at 50% 0%, rgb(var(--navy-rgb) / .9), rgb(var(--ink-rgb) / 1) 65%)',
             }}
           />
           <GeometricPattern variant="lattice" opacity={0.03} scale={110} color="#4c8f83" />
@@ -234,12 +235,12 @@ export default function HomePage() {
                     className="absolute inset-0"
                     style={{
                       background:
-                        'linear-gradient(to bottom, rgba(4,7,11,.2), rgba(4,7,11,.6) 60%, rgba(4,7,11,.95))',
+                        'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.2 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.6 * var(--scrim-k))) 60%, rgb(var(--ink-rgb) / calc(.95 * var(--scrim-k))))',
                     }}
                   />
                   <span
                     className="font-display absolute top-4 left-5 text-[0.62rem] tracking-[0.34em] tabular-nums"
-                    style={{ color: c.accent }}
+                    style={{ color: ac(c.accent) }}
                   >
                     {String(i + 1).padStart(2, '0')}
                   </span>
@@ -252,10 +253,10 @@ export default function HomePage() {
                     aria-hidden="true"
                     className="absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:w-full"
                     style={{
-                      background: `linear-gradient(90deg, transparent, ${c.accent}, transparent)`,
+                      background: `linear-gradient(90deg, transparent, ${ac(c.accent)}, transparent)`,
                     }}
                   />
-                  <span className="text-[0.62rem] tracking-[0.3em] uppercase" style={{ color: `${c.accent}aa` }}>
+                  <span className="text-[0.62rem] tracking-[0.3em] uppercase" style={{ color: `${ac(c.accent)}aa` }}>
                     {c.kicker}
                   </span>
                   <span className="mt-3 block text-[0.85rem] leading-relaxed text-ivory-dim/65">

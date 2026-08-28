@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion, useTransform, type MotionValue } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
@@ -9,7 +10,7 @@ import SceneArt from '../components/visuals/SceneArt'
 import ParticleField from '../components/visuals/ParticleField'
 import Plate from '../components/Plate'
 import { GeometricPattern, Rosette, OrnamentDivider } from '../components/visuals/GeometricPattern'
-import { GoldButton, Grain, SourceTag, Vignette } from '../components/ui'
+import { GoldButton, SourceTag } from '../components/ui'
 import {
   Beat,
   Eyebrow,
@@ -46,10 +47,10 @@ export function MuhammadScene() {
         flat={
           <div className="relative overflow-hidden px-5 py-24 text-center">
             <div aria-hidden="true" className="absolute inset-0 -z-10 opacity-50">
-              <SceneArt art="muhammad" progress={0.9} accent={M.accent} />
+              <SceneArt art="muhammad" progress={0.9} accent={ac(M.accent)} />
             </div>
             <div className="absolute inset-0 -z-10 bg-ink/72" aria-hidden="true" />
-            <Eyebrow color={M.accent}>Chapter Seven</Eyebrow>
+            <Eyebrow color={ac(M.accent)}>Chapter Seven</Eyebrow>
             <h2 className="font-display text-gilded mt-6 text-[clamp(2.4rem,9vw,6rem)] leading-none font-light uppercase">
               Muhammad ﷺ
             </h2>
@@ -62,14 +63,14 @@ export function MuhammadScene() {
         {(prog) => (
           <>
             <Beat progress={prog} from={0} to={0.28}>
-              <Eyebrow color={M.accent}>Chapter Seven</Eyebrow>
+              <Eyebrow color={ac(M.accent)}>Chapter Seven</Eyebrow>
               <Statement size="md" className="mt-7">
                 A quiet night over the desert.
               </Statement>
             </Beat>
 
             <Beat progress={prog} from={0.28} to={0.54}>
-              <p className="font-arabic text-4xl sm:text-6xl" style={{ color: M.accent }} lang="ar">
+              <p className="font-arabic text-4xl sm:text-6xl" style={{ color: ac(M.accent) }} lang="ar">
                 {M.arabic}
               </p>
               <h2 className="font-display text-gilded anim-shimmer mt-6 text-[clamp(2.4rem,11vw,7.5rem)] leading-none font-light uppercase">
@@ -92,7 +93,7 @@ export function MuhammadScene() {
                   lang="ar"
                   dir="rtl"
                   className="font-arabic mt-7 text-[clamp(1.4rem,4vw,2.4rem)] leading-[2]"
-                  style={{ color: M.accent }}
+                  style={{ color: ac(M.accent) }}
                 >
                   {MERCY.arabic}
                 </p>
@@ -112,28 +113,26 @@ export function MuhammadScene() {
       {/* ── the five qualities ───────────────────────────────────── */}
       <section
         aria-label="Five qualities of the Messenger ﷺ"
-        className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-24"
+        className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-24"
       >
         <div aria-hidden="true" className="absolute inset-0">
           <Plate id="muhammad" opacity={0.8} />
           <div className="absolute inset-0 opacity-70">
-            <SceneArt art="muhammad" progress={0.95} accent={M.accent} />
+            <SceneArt art="muhammad" progress={0.95} accent={ac(M.accent)} />
           </div>
           <div
             className="absolute inset-0"
             style={{
               background:
-                'linear-gradient(to bottom, rgba(4,7,11,.7), rgba(4,7,11,.8) 50%, rgba(4,7,11,.96))',
+                'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.7 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.8 * var(--scrim-k))) 50%, rgb(var(--ink-rgb) / calc(.96 * var(--scrim-k))))',
             }}
           />
-          <ParticleField weather="stars" density={1.1} color={M.accent} opacity={0.6} />
-          <GeometricPattern variant="khatam" opacity={0.03} scale={175} color={M.accent} />
+          <ParticleField weather="stars" density={1.1} color={ac(M.accent)} opacity={0.6} />
+          <GeometricPattern variant="khatam" opacity={0.03} scale={175} color={ac(M.accent)} />
         </div>
-        <Vignette strength={0.85} />
-        <Grain opacity={0.03} />
 
         <div className="relative z-30 w-full max-w-4xl text-center">
-          <p className="text-[0.66rem] tracking-[0.44em] uppercase" style={{ color: `${M.accent}bb` }}>
+          <p className="text-[0.66rem] tracking-[0.44em] uppercase" style={{ color: `${ac(M.accent)}bb` }}>
             His character, in five words
           </p>
 
@@ -164,10 +163,10 @@ export function MuhammadScene() {
                     aria-pressed={on}
                     className="group relative cursor-pointer border px-6 py-4 text-[0.72rem] tracking-[0.26em] uppercase transition-all duration-500 sm:px-8"
                     style={{
-                      borderColor: on ? M.accent : `${M.accent}33`,
-                      color: on ? '#f6e5bf' : `${M.accent}dd`,
-                      background: on ? `${M.accent}1c` : 'rgba(4,7,11,.45)',
-                      boxShadow: on ? `0 0 50px -12px ${M.accent}` : 'none',
+                      borderColor: on ? ac(M.accent) : `${ac(M.accent)}33`,
+                      color: on ? 'var(--color-gold-bright)' : `${ac(M.accent)}dd`,
+                      background: on ? `${ac(M.accent)}1c` : 'rgb(var(--ink-rgb) / .45)',
+                      boxShadow: on ? `0 0 50px -12px ${ac(M.accent)}` : 'none',
                     }}
                   >
                     {q.title}
@@ -183,7 +182,7 @@ export function MuhammadScene() {
                 <InfoPanel
                   key={active.id}
                   title={active.title}
-                  accent={M.accent}
+                  accent={ac(M.accent)}
                   onClose={() => {
                     cue('close')
                     setOpen(null)
@@ -216,20 +215,18 @@ function MuhammadBackdrop({ progress, step }: { progress: MotionValue<number>; s
     <div aria-hidden="true" className="absolute inset-0">
       <Plate id="muhammad" opacity={0.9} />
       <motion.div className="absolute inset-0 opacity-85" style={{ scale }}>
-        <SceneArt art="muhammad" progress={step / 40} accent={M.accent} />
+        <SceneArt art="muhammad" progress={step / 14} accent={ac(M.accent)} />
       </motion.div>
       <div
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(to bottom, rgba(4,7,11,.52), rgba(4,7,11,.28) 40%, rgba(4,7,11,.88))',
+            'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.52 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.28 * var(--scrim-k))) 40%, rgb(var(--ink-rgb) / calc(.88 * var(--scrim-k))))',
         }}
       />
-      <ParticleField weather="stars" density={1} color={M.accent} opacity={0.6} />
+      <ParticleField weather="stars" density={1} color={ac(M.accent)} opacity={0.6} />
       <SceneVeil progress={progress} />
-      <Vignette strength={0.84} />
-      <Grain opacity={0.032} />
-      <SceneRail progress={progress} accent={M.accent} />
+      <SceneRail progress={progress} accent={ac(M.accent)} />
     </div>
   )
 }
@@ -247,18 +244,17 @@ export function ActionScene() {
       id="action"
       data-scene="action"
       aria-label="How do we show respect"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-16"
+      className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-16"
     >
       <div aria-hidden="true" className="absolute inset-0">
+        <Plate id="ch-respect" opacity={0.5} />
         <div
           className="absolute inset-0"
-          style={{ background: 'radial-gradient(80% 70% at 50% 100%, rgba(211,173,104,.14), rgba(4,7,11,1) 70%)' }}
+          style={{ background: 'radial-gradient(80% 70% at 50% 100%, rgb(var(--gold-rgb) / .14), rgb(var(--ink-rgb) / .92) 70%)' }}
         />
         <GeometricPattern variant="weave" opacity={0.03} scale={130} color="#d3ad68" />
         <ParticleField weather="dust" density={0.6} color="#d3ad68" opacity={0.45} />
       </div>
-      <Vignette strength={0.85} />
-      <Grain opacity={0.03} />
 
       <div className="relative z-30 w-full max-w-3xl">
         <div className="text-center">
@@ -286,9 +282,9 @@ export function ActionScene() {
                   aria-expanded={on}
                   className="group relative block w-full cursor-pointer overflow-hidden border text-left transition-all duration-700"
                   style={{
-                    borderColor: on ? 'rgba(211,173,104,.6)' : 'rgba(211,173,104,.14)',
-                    background: on ? 'rgba(9,14,24,.86)' : 'rgba(6,10,17,.6)',
-                    boxShadow: on ? '0 0 70px -26px rgba(211,173,104,.85)' : 'none',
+                    borderColor: on ? 'rgb(var(--gold-rgb) / .6)' : 'rgb(var(--gold-rgb) / .14)',
+                    background: on ? 'rgb(var(--ink-2-rgb) / .86)' : 'rgb(var(--ink-2-rgb) / .6)',
+                    boxShadow: on ? '0 0 70px -26px rgb(var(--gold-rgb) / .85)' : 'none',
                   }}
                 >
                   <span
@@ -299,7 +295,7 @@ export function ActionScene() {
                   <span className="flex items-baseline gap-5 px-6 py-5 sm:px-8">
                     <span
                       className="font-display shrink-0 text-[0.72rem] tracking-[0.3em] tabular-nums transition-colors duration-500"
-                      style={{ color: on ? '#d3ad68' : 'rgba(211,173,104,.45)' }}
+                      style={{ color: on ? 'var(--color-gold)' : 'rgb(var(--gold-rgb) / .45)' }}
                     >
                       {s.n}
                     </span>
@@ -309,7 +305,7 @@ export function ActionScene() {
                           ? 'text-[clamp(1.5rem,5vw,2.9rem)]'
                           : 'text-[clamp(1.2rem,3.6vw,2rem)]'
                       }`}
-                      style={{ color: on ? '#f6e5bf' : '#ece4d5' }}
+                      style={{ color: on ? 'var(--color-gold-bright)' : 'var(--color-ivory)' }}
                     >
                       {s.title}
                     </span>
@@ -481,7 +477,7 @@ function DawnBackdrop({ progress }: { progress: MotionValue<number> }) {
         style={{
           opacity: dawn,
           background:
-            'linear-gradient(to top, rgba(246,229,191,.30), rgba(211,173,104,.12) 42%, transparent 75%)',
+            'linear-gradient(to top, rgb(var(--glow-rgb) / .34), rgb(var(--gold-rgb) / .12) 42%, transparent 75%)',
         }}
       />
       {/* The light sits low, on the horizon — the words live in the calm
@@ -491,7 +487,7 @@ function DawnBackdrop({ progress }: { progress: MotionValue<number> }) {
         style={{
           scale: lightScale,
           background:
-            'radial-gradient(circle, rgba(246,229,191,.8) 0%, rgba(211,173,104,.28) 18%, rgba(211,173,104,.06) 42%, transparent 68%)',
+            'radial-gradient(circle, rgb(var(--glow-rgb) / .85) 0%, rgb(var(--gold-rgb) / .28) 18%, rgb(var(--gold-rgb) / .06) 42%, transparent 68%)',
         }}
       />
       <motion.div
@@ -505,13 +501,11 @@ function DawnBackdrop({ progress }: { progress: MotionValue<number> }) {
         className="absolute inset-x-0 top-[18%] h-[46%]"
         style={{
           background:
-            'radial-gradient(60% 100% at 50% 50%, rgba(3,5,9,.62), rgba(3,5,9,.28) 60%, transparent 80%)',
+            'radial-gradient(60% 100% at 50% 50%, rgb(var(--ink-rgb) / .62), rgb(var(--ink-rgb) / .28) 60%, transparent 80%)',
         }}
       />
       <SceneVeil progress={progress} />
-      <Vignette strength={0.94} />
-      <Grain opacity={0.035} />
-      <SceneRail progress={progress} accent="#f6e5bf" />
+      <SceneRail progress={progress} accent="var(--color-gold)" />
     </div>
   )
 }

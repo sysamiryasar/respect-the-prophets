@@ -1,5 +1,15 @@
 import { useId, memo } from 'react'
 import type { ArtKey } from '../../data/prophets'
+import {
+  ac,
+  glowScale,
+  ground,
+  isLight as isLightArt,
+  shaftColor,
+  sil,
+  sky,
+  starColor,
+} from '../../lib/art'
 
 /* ================================================================== *
  * SYMBOLIC SCENE ARTWORK
@@ -67,8 +77,8 @@ function Sky({ id, top, bottom }: { id: string; top: string; bottom: string }) {
     <>
       <defs>
         <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={top} />
-          <stop offset="100%" stopColor={bottom} />
+          <stop offset="0%" stopColor={sky(top, 0)} />
+          <stop offset="100%" stopColor={sky(bottom, 1)} />
         </linearGradient>
       </defs>
       <rect width={VB.w} height={VB.h} fill={`url(#${id})`} />
@@ -95,9 +105,9 @@ function Glow({
     <>
       <defs>
         <radialGradient id={id}>
-          <stop offset="0%" stopColor={color} stopOpacity={strength} />
-          <stop offset="45%" stopColor={color} stopOpacity={strength * 0.28} />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
+          <stop offset="0%" stopColor={ac(color)} stopOpacity={strength * glowScale()} />
+          <stop offset="45%" stopColor={ac(color)} stopOpacity={strength * 0.28 * glowScale()} />
+          <stop offset="100%" stopColor={ac(color)} stopOpacity="0" />
         </radialGradient>
       </defs>
       <circle cx={cx} cy={cy} r={r} fill={`url(#${id})`} />
@@ -105,7 +115,7 @@ function Glow({
   )
 }
 
-function LightShafts({ x, y, count = 7, spread = 520, length = 620, color = '#f6e5bf', opacity = 0.1 }: {
+function LightShafts({ x, y, count = 7, spread = 520, length = 620, color = starColor(), opacity = 0.1 }: {
   x: number
   y: number
   count?: number
@@ -114,8 +124,9 @@ function LightShafts({ x, y, count = 7, spread = 520, length = 620, color = '#f6
   color?: string
   opacity?: number
 }) {
+  const fill = color ? ac(color) : shaftColor()
   return (
-    <g opacity={opacity} style={{ mixBlendMode: 'screen' }}>
+    <g opacity={opacity} style={{ mixBlendMode: isLightArt() ? 'multiply' : 'screen' }}>
       {Array.from({ length: count }, (_, i) => {
         const t = count === 1 ? 0.5 : i / (count - 1)
         const dx = (t - 0.5) * spread
@@ -124,7 +135,7 @@ function LightShafts({ x, y, count = 7, spread = 520, length = 620, color = '#f6
           <path
             key={i}
             d={`M${x - w / 2},${y} L${x + w / 2},${y} L${x + dx + w * 3},${y + length} L${x + dx - w * 3},${y + length} Z`}
-            fill={color}
+            fill={fill}
             opacity={0.35 + 0.65 * (1 - Math.abs(t - 0.5) * 2)}
           />
         )
@@ -140,7 +151,7 @@ function StarPoints({ seed = 1, count = 70, maxY = 420 }: { seed?: number; count
     return s / 233280
   }
   return (
-    <g fill="#f6e5bf">
+    <g fill={starColor()}>
       {Array.from({ length: count }, (_, i) => {
         const x = rnd() * VB.w
         const y = rnd() * maxY
@@ -194,7 +205,7 @@ function AdamArt({ progress, accent }: ArtProps) {
       </g>
 
       {/* first light from above */}
-      <LightShafts x={600} y={-40} count={9} spread={720} length={620} color="#f6e5bf" opacity={0.05 + dawn * 0.09} />
+      <LightShafts x={600} y={-40} count={9} spread={720} length={620} color={starColor()} opacity={0.05 + dawn * 0.09} />
 
       {/* an abstract garden: arches of foliage, no figures */}
       <g opacity={0.5 + dawn * 0.3}>
@@ -359,13 +370,13 @@ function IbrahimArt({ progress, accent }: ArtProps) {
           sweep, or SVG scales it up to fit the chord and you get a full
           disc instead of a crescent. */}
       <g transform={`translate(${moonX.toFixed(1)} ${lerp(150, 96, progress).toFixed(1)})`}>
-        <circle cx="0" cy="0" r="34" fill="#f6e5bf" opacity="0.07" />
-        <path d="M0,-30 A30,30 0 1,0 0,30 A40,40 0 0,0 0,-30 Z" fill="#f6e5bf" opacity="0.9" />
+        <circle cx="0" cy="0" r="34" fill={starColor()} opacity="0.07" />
+        <path d="M0,-30 A30,30 0 1,0 0,30 A40,40 0 0,0 0,-30 Z" fill={starColor()} opacity="0.9" />
       </g>
 
       {/* desert dunes */}
-      <path d={ridgePath(520, 26, 0.4)} fill="#160d08" />
-      <path d={ridgePath(576, 20, 2.6)} fill="#0d0705" />
+      <path d={ridgePath(520, 26, 0.4)} fill={ground('#160d08', 0.45)} />
+      <path d={ridgePath(576, 20, 2.6)} fill={ground('#0d0705', 0.8)} />
 
       {/* broken idols: toppled plinths and columns. No faces, no figures. */}
       <g opacity={lerp(0.9, 0.35, cool)}>
@@ -392,9 +403,19 @@ function IbrahimArt({ progress, accent }: ArtProps) {
       <g>
         <defs>
           <linearGradient id={`fire${u}`} x1="0" y1="1" x2="0" y2="0">
-            <stop offset="0%" stopColor={fireColor} stopOpacity={lerp(0.85, 0.5, cool)} />
-            <stop offset="55%" stopColor={cool > 0.5 ? '#bfe8f2' : '#f0a860'} stopOpacity={lerp(0.5, 0.3, cool)} />
-            <stop offset="100%" stopColor={cool > 0.5 ? '#e8f6ff' : '#f6e5bf'} stopOpacity="0" />
+            {/* On parchment the flame has to stay warm and opaque or it
+                bleaches into the ground. */}
+            <stop
+              offset="0%"
+              stopColor={ac(fireColor)}
+              stopOpacity={lerp(0.85, 0.5, cool) * (isLightArt() ? 1.15 : 1)}
+            />
+            <stop
+              offset="55%"
+              stopColor={ac(cool > 0.5 ? '#bfe8f2' : '#f0a860')}
+              stopOpacity={lerp(0.5, 0.3, cool) * (isLightArt() ? 1.3 : 1)}
+            />
+            <stop offset="100%" stopColor={ac(cool > 0.5 ? '#e8f6ff' : '#e0b056')} stopOpacity="0" />
           </linearGradient>
         </defs>
         <Glow id={`fg${u}`} cx={600} cy={520} r={lerp(300, 420, progress)} color={fireColor} strength={0.4} />
@@ -486,7 +507,7 @@ function MusaArt({ progress, accent }: ArtProps) {
         <path d="M0,430 L180,270 L300,352 L420,214 L560,430 Z" fill="#07161c" stroke={accent} strokeOpacity="0.2" />
         <path d="M700,430 L840,268 L960,340 L1090,236 L1200,430 Z" fill="#07161c" stroke={accent} strokeOpacity="0.14" />
       </g>
-      <Glow id={`vg${u}`} cx={420} cy={228} r={lerp(150, 60, open)} color="#f6e5bf" strength={lerp(0.55, 0.15, open)} />
+      <Glow id={`vg${u}`} cx={420} cy={228} r={lerp(150, 60, open)} color={starColor()} strength={lerp(0.55, 0.15, open)} />
 
       {/* dry seabed corridor, receding to the horizon */}
       <g opacity={open}>
@@ -551,7 +572,7 @@ function MusaArt({ progress, accent }: ArtProps) {
       </g>
 
       {/* foreground sand */}
-      <path d={ridgePath(636, 12, 1.4)} fill="#120d06" />
+      <path d={ridgePath(636, 12, 1.4)} fill={ground('#120d06', 1)} />
     </svg>
   )
 }
@@ -574,10 +595,10 @@ function YusufArt({ progress, accent }: ArtProps) {
 
       {/* ── the well: looking up from the bottom ── */}
       <g opacity={wellA}>
-        <rect width={VB.w} height={VB.h} fill="#04030a" />
+        <rect width={VB.w} height={VB.h} fill={sky('#04030a', 1)} />
         <defs>
           <radialGradient id={`shaft${u}`} cx="0.5" cy="0.24" r="0.55">
-            <stop offset="0%" stopColor="#f6e5bf" stopOpacity="0.85" />
+            <stop offset="0%" stopColor={shaftColor()} stopOpacity="0.85" />
             <stop offset="40%" stopColor={accent} stopOpacity="0.2" />
             <stop offset="100%" stopColor="#04030a" stopOpacity="0" />
           </radialGradient>
@@ -602,13 +623,13 @@ function YusufArt({ progress, accent }: ArtProps) {
           )
         })}
         <ellipse cx="600" cy="158" rx="132" ry="60" fill={`url(#shaft${u})`} />
-        <ellipse cx="600" cy="158" rx="132" ry="60" fill="none" stroke="#f6e5bf" strokeOpacity="0.55" strokeWidth="2" />
-        <LightShafts x={600} y={168} count={5} spread={300} length={520} color="#f6e5bf" opacity={0.14} />
+        <ellipse cx="600" cy="158" rx="132" ry="60" fill="none" stroke={starColor()} strokeOpacity="0.55" strokeWidth="2" />
+        <LightShafts x={600} y={168} count={5} spread={300} length={520} color={starColor()} opacity={0.14} />
       </g>
 
       {/* ── prison bars ── */}
       <g opacity={prisonA}>
-        <rect width={VB.w} height={VB.h} fill="#07060c" />
+        <rect width={VB.w} height={VB.h} fill={sky('#07060c', 1)} />
         <Glow id={`pg${u}`} cx={600} cy={300} r={420} color={accent} strength={0.16} />
         <g>
           {Array.from({ length: 9 }, (_, i) => {
@@ -627,8 +648,8 @@ function YusufArt({ progress, accent }: ArtProps) {
       <g opacity={palaceA}>
         <defs>
           <linearGradient id={`pal${u}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#241a3a" />
-            <stop offset="100%" stopColor="#0a0714" />
+            <stop offset="0%" stopColor={sky('#241a3a', 0.2)} />
+            <stop offset="100%" stopColor={sky('#0a0714', 1)} />
           </linearGradient>
         </defs>
         <rect width={VB.w} height={VB.h} fill={`url(#pal${u})`} />
@@ -663,11 +684,11 @@ function YusufArt({ progress, accent }: ArtProps) {
           const y = 300 + Math.sin(a) * R * 0.68
           return (
             <g key={i}>
-              <circle cx={x} cy={y} r="4.5" fill="#f6e5bf" />
-              <circle cx={x} cy={y} r="14" fill="#f6e5bf" opacity="0.15" />
+              <circle cx={x} cy={y} r="4.5" fill={starColor()} />
+              <circle cx={x} cy={y} r="14" fill={starColor()} opacity="0.15" />
               <path
                 d={`M${x - 22},${y} L${x + 22},${y} M${x},${y - 22} L${x},${y + 22}`}
-                stroke="#f6e5bf"
+                stroke={starColor()}
                 strokeOpacity="0.35"
                 strokeWidth="1"
               />
@@ -696,8 +717,8 @@ function IsaArt({ progress, accent }: ArtProps) {
       <Glow id={`sun${u}`} cx={600} cy={300} r={lerp(240, 400, progress)} color="#dff0ff" strength={0.18 * light} />
 
       {/* distant hills */}
-      <path d={ridgePath(452, 22, 1.1)} fill="#0d1620" />
-      <path d={ridgePath(492, 16, 3.4)} fill="#0a1119" />
+      <path d={ridgePath(452, 22, 1.1)} fill={ground('#0d1620', 0.35)} />
+      <path d={ridgePath(492, 16, 3.4)} fill={ground('#0a1119', 0.7)} />
 
       {/* ancient colonnade — architecture only */}
       <g>
@@ -774,9 +795,9 @@ function MuhammadArt({ progress, accent }: ArtProps) {
     <svg viewBox={`0 0 ${VB.w} ${VB.h}`} preserveAspectRatio="xMidYMid slice" className="h-full w-full">
       <defs>
         <linearGradient id={`sky${u}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#03060c" />
-          <stop offset="55%" stopColor={dawn > 0.5 ? '#0d2028' : '#060d16'} />
-          <stop offset="100%" stopColor={dawn > 0.5 ? '#2a2313' : '#0a1418'} />
+          <stop offset="0%" stopColor={sky('#03060c', 0)} />
+          <stop offset="55%" stopColor={sky(dawn > 0.5 ? '#0d2028' : '#060d16', 0.6)} />
+          <stop offset="100%" stopColor={sky(dawn > 0.5 ? '#2a2313' : '#0a1418', 1)} />
         </linearGradient>
       </defs>
       <rect width={VB.w} height={VB.h} fill={`url(#sky${u})`} />
@@ -788,7 +809,7 @@ function MuhammadArt({ progress, accent }: ArtProps) {
       <Glow id={`dw${u}`} cx={600} cy={520} r={lerp(260, 620, dawn)} color={accent} strength={0.16 + dawn * 0.3} />
 
       {/* distant hills of the valley */}
-      <path d={ridgePath(470, 30, 0.9)} fill="#060d12" />
+      <path d={ridgePath(470, 30, 0.9)} fill={ground('#060d12', 0.3)} />
 
       {/* Madinah-inspired skyline: domes and minarets, no interiors */}
       <g opacity={0.9}>
@@ -867,7 +888,7 @@ function MuhammadArt({ progress, accent }: ArtProps) {
 
       {/* the road */}
       <path d="M480,675 L560,540 L640,540 L720,675 Z" fill={accent} opacity={0.05 + dawn * 0.05} />
-      <path d={ridgePath(648, 8, 2.2)} fill="#050a0d" />
+      <path d={ridgePath(648, 8, 2.2)} fill={ground('#050a0d', 1)} />
     </svg>
   )
 }
@@ -886,8 +907,8 @@ function EmblemArt({ id, accent, progress }: ArtProps & { id: ArtKey }) {
         return (
           <g>
             {/* a spring welling in barren ground + stone foundations */}
-            <path d={ridgePath(500, 18, 1.2)} fill="#120d06" />
-            <ellipse cx="600" cy="512" rx="120" ry="34" fill="#0e2b30" stroke={accent} strokeOpacity="0.5" strokeWidth="2" />
+            <path d={ridgePath(500, 18, 1.2)} fill={ground('#120d06', 1)} />
+            <ellipse cx="600" cy="512" rx="120" ry="34" fill={ground('#0e2b30', 0.5)} stroke={accent} strokeOpacity="0.5" strokeWidth="2" />
             {[0, 1, 2].map((i) => (
               <ellipse key={i} cx="600" cy="512" rx={60 + i * 34} ry={17 + i * 10} fill="none" stroke={accent} strokeOpacity={0.28 - i * 0.07} />
             ))}
@@ -899,8 +920,8 @@ function EmblemArt({ id, accent, progress }: ArtProps & { id: ArtKey }) {
       case 'ishaq':
         return (
           <g>
-            <path d={ridgePath(470, 26, 0.5)} fill="#111a10" />
-            <path d={ridgePath(520, 18, 2.8)} fill="#0a110a" />
+            <path d={ridgePath(470, 26, 0.5)} fill={ground('#111a10', 0.45)} />
+            <path d={ridgePath(520, 18, 2.8)} fill={ground('#0a110a', 0.8)} />
             <g transform="translate(600 470)">
               <path d="M0,140 Q-14,40 0,-40" stroke={accent} strokeOpacity="0.5" strokeWidth="3" fill="none" />
               {Array.from({ length: 10 }, (_, k) => {
@@ -914,7 +935,7 @@ function EmblemArt({ id, accent, progress }: ArtProps & { id: ArtKey }) {
       case 'yaqub':
         return (
           <g>
-            <path d={ridgePath(500, 14, 1.9)} fill="#1a120c" />
+            <path d={ridgePath(500, 14, 1.9)} fill={ground('#1a120c', 0.6)} />
             {/* an empty road receding, with a lamp in a doorway */}
             <path d="M520,675 L578,470 L622,470 L680,675 Z" fill={accent} opacity="0.08" />
             {Array.from({ length: 6 }, (_, i) => {
@@ -933,9 +954,9 @@ function EmblemArt({ id, accent, progress }: ArtProps & { id: ArtKey }) {
       case 'harun':
         return (
           <g>
-            <path d="M0,470 L200,300 L340,392 L470,470 Z" fill="#0a1512" />
-            <path d="M730,470 L860,320 L1000,400 L1200,470 Z" fill="#0a1512" />
-            <path d={ridgePath(520, 16, 1.5)} fill="#07100e" />
+            <path d="M0,470 L200,300 L340,392 L470,470 Z" fill={ground('#0a1512', 0.4)} />
+            <path d="M730,470 L860,320 L1000,400 L1200,470 Z" fill={ground('#0a1512', 0.4)} />
+            <path d={ridgePath(520, 16, 1.5)} fill={ground('#07100e', 0.75)} />
             {/* two paths converging */}
             <path d="M300,675 Q520,540 600,470" stroke={accent} strokeOpacity="0.35" strokeWidth="3" fill="none" />
             <path d="M900,675 Q680,540 600,470" stroke={accent} strokeOpacity="0.35" strokeWidth="3" fill="none" />
@@ -975,7 +996,7 @@ function EmblemArt({ id, accent, progress }: ArtProps & { id: ArtKey }) {
       case 'sulayman':
         return (
           <g>
-            <rect y="440" width={VB.w} height="235" fill="#120c22" />
+            <rect y="440" width={VB.w} height="235" fill={sil('#120c22', 0.28)} />
             {[300, 600, 900].map((x, i) => (
               <path key={x} d={archPath(x, 560, 200 - i * 10, 320)} fill="#0a0716" stroke={accent} strokeOpacity="0.4" strokeWidth="2" />
             ))}
@@ -997,10 +1018,10 @@ function EmblemArt({ id, accent, progress }: ArtProps & { id: ArtKey }) {
       case 'yunus':
         return (
           <g>
-            <rect width={VB.w} height={VB.h} fill="#02141a" />
+            <rect width={VB.w} height={VB.h} fill={sky('#02141a', 1)} />
             {/* layered darkness of the depths */}
             {[0, 1, 2, 3].map((i) => (
-              <rect key={i} y={i * 150} width={VB.w} height="170" fill="#01090d" opacity={0.18 + i * 0.16} />
+              <rect key={i} y={i * 150} width={VB.w} height="170" fill={sil('#01090d', 0.3)} opacity={0.18 + i * 0.16} />
             ))}
             <LightShafts x={600} y={-20} count={3} spread={200} length={560} color={accent} opacity={0.18} />
             {/* a single shaft reaching down */}
@@ -1021,7 +1042,7 @@ function EmblemArt({ id, accent, progress }: ArtProps & { id: ArtKey }) {
       case 'zakariyya':
         return (
           <g>
-            <rect width={VB.w} height={VB.h} fill="#070d14" />
+            <rect width={VB.w} height={VB.h} fill={sky('#070d14', 1)} />
             {/* a mihrab niche */}
             <path d={archPath(600, 620, 300, 470)} fill="#0b131c" stroke={accent} strokeOpacity="0.45" strokeWidth="2.5" />
             <path d={archPath(600, 600, 210, 380)} fill="#060b12" stroke={accent} strokeOpacity="0.28" strokeWidth="1.6" />
@@ -1045,7 +1066,7 @@ function EmblemArt({ id, accent, progress }: ArtProps & { id: ArtKey }) {
           <g>
             <path d={ridgePath(430, 24, 0.8)} fill="#0a1a16" />
             {/* a river catching first light */}
-            <path d="M0,675 L420,470 L780,470 L1200,675 Z" fill="#0b2a26" />
+            <path d="M0,675 L420,470 L780,470 L1200,675 Z" fill={ground('#0b2a26', 0.6)} />
             <path d="M0,675 L420,470 L780,470 L1200,675 Z" fill={accent} opacity="0.1" />
             {Array.from({ length: 6 }, (_, i) => {
               const t = i / 6

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { PLATES, PLATE_WIDTHS } from '../data/plates'
+import { useJourney } from '../lib/journey'
 
 /** Assets live under the deploy base, which is not always the root. */
 const BASE = import.meta.env.BASE_URL
@@ -33,11 +34,16 @@ export default function Plate({
   opacity = 1,
   sizes = '100vw',
 }: Props) {
+  const { theme } = useJourney()
   const plate = PLATES[id]
   const [loaded, setLoaded] = useState(false)
 
+  // Each plate ships a night and a parchment rendering.
+  const name = theme === 'light' ? `${id}-light` : id
+  const lqip = theme === 'light' ? plate?.lqipLight : plate?.lqip
+
   const srcSet = (ext: string) =>
-    PLATE_WIDTHS.map((w) => `${BASE}img/${id}-${w}.${ext} ${w}w`).join(', ')
+    PLATE_WIDTHS.map((w) => `${BASE}img/${name}-${w}.${ext} ${w}w`).join(', ')
 
   return (
     <div
@@ -45,20 +51,21 @@ export default function Plate({
       className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}
     >
       {/* blur-up placeholder */}
-      {plate && (
+      {lqip && (
         <img
-          src={plate.lqip}
+          key={`lqip-${name}`}
+          src={lqip}
           alt=""
           aria-hidden="true"
           className="absolute inset-0 h-full w-full scale-110 object-cover blur-xl transition-opacity duration-1000"
           style={{ opacity: loaded ? 0 : opacity }}
         />
       )}
-      <picture>
+      <picture key={name}>
         <source type="image/avif" srcSet={srcSet('avif')} sizes={sizes} />
         <source type="image/webp" srcSet={srcSet('webp')} sizes={sizes} />
         <img
-          src={`${BASE}img/${id}-1600.webp`}
+          src={`${BASE}img/${name}-1600.webp`}
           alt=""
           width={1600}
           height={900}

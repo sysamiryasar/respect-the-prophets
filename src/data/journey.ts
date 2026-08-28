@@ -23,6 +23,7 @@ export const JOURNEY_NAV: NavSection[] = [
   { id: 'stories', label: 'Stories' },
   { id: 'trials', label: 'Trials' },
   { id: 'lessons', label: 'Lessons' },
+  { id: 'quran', label: 'Qur’an' },
   { id: 'muhammad', label: 'Muhammad ﷺ' },
   { id: 'action', label: 'Action' },
   { id: 'final', label: 'Final' },

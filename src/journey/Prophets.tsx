@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { PATH_PROPHETS } from '../data/journey'
@@ -7,7 +8,7 @@ import ParticleField from '../components/visuals/ParticleField'
 import ProphetGlyph from '../components/visuals/ProphetGlyph'
 import Plate from '../components/Plate'
 import { OrnamentDivider } from '../components/visuals/GeometricPattern'
-import { Grain, Vignette, useInViewSafe } from '../components/ui'
+import { useInViewSafe } from '../components/ui'
 import { Eyebrow, Statement, useRevealOnSelect } from './kit'
 import { useRef } from 'react'
 
@@ -31,7 +32,7 @@ export function ProphetsScene() {
       id="prophets"
       data-scene="prophets"
       aria-label="The Prophets"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-start px-5 pt-28 pb-20"
+      className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-start px-5 pt-28 pb-20"
     >
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
         <AnimatePresence>
@@ -52,7 +53,7 @@ export function ProphetsScene() {
           className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(85% 60% at 50% 50%, rgba(10,17,32,.72), rgba(4,7,11,1) 76%)',
+              'radial-gradient(85% 60% at 50% 50%, rgb(var(--navy-rgb) / .72), rgb(var(--ink-rgb) / 1) 76%)',
           }}
         />
         <ParticleField
@@ -62,8 +63,6 @@ export function ProphetsScene() {
           opacity={0.7}
         />
       </div>
-      <Vignette strength={0.85} />
-      <Grain opacity={0.03} />
 
       <div className="relative z-30 w-full max-w-6xl">
         <div className="text-center">
@@ -165,12 +164,12 @@ export function ProphetsScene() {
                 <span
                   className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border backdrop-blur-sm transition-all duration-500 group-hover:scale-110"
                   style={{
-                    borderColor: on ? p.accent : `${p.accent}55`,
-                    background: `radial-gradient(circle, ${p.accent}22, rgba(4,7,11,.85) 72%)`,
-                    boxShadow: on ? `0 0 34px -4px ${p.accent}` : 'none',
+                    borderColor: on ? ac(p.accent) : `${ac(p.accent)}55`,
+                    background: `radial-gradient(circle, ${ac(p.accent)}22, rgb(var(--ink-rgb) / .85) 72%)`,
+                    boxShadow: on ? `0 0 34px -4px ${ac(p.accent)}` : 'none',
                   }}
                 >
-                  <ProphetGlyph id={pt.id} className="h-6 w-6" color={p.accent} />
+                  <ProphetGlyph id={pt.id} className="h-6 w-6" color={ac(p.accent)} />
                 </span>
                 <span className={compact ? 'text-left' : 'mt-3 text-center'}>
                   <span
@@ -210,12 +209,12 @@ export function ProphetsScene() {
                   aria-hidden="true"
                   className="absolute top-0 left-0 h-px w-full"
                   style={{
-                    background: `linear-gradient(90deg, transparent, ${prophet.accent}, transparent)`,
+                    background: `linear-gradient(90deg, transparent, ${ac(prophet.accent)}, transparent)`,
                   }}
                 />
                 <div className="flex flex-wrap items-start justify-between gap-5">
                   <div>
-                    <p className="font-arabic text-2xl" style={{ color: prophet.accent }} lang="ar">
+                    <p className="font-arabic text-2xl" style={{ color: ac(prophet.accent) }} lang="ar">
                       {prophet.arabic}
                     </p>
                     <h3 className="font-display mt-2 text-4xl leading-none font-light text-ivory sm:text-5xl">
@@ -225,7 +224,7 @@ export function ProphetsScene() {
                       </span>
                     </h3>
                   </div>
-                  <ProphetGlyph id={point.id} className="h-10 w-10 shrink-0" color={prophet.accent} />
+                  <ProphetGlyph id={point.id} className="h-10 w-10 shrink-0" color={ac(prophet.accent)} />
                 </div>
 
                 <div className="hairline my-7 h-px w-full" aria-hidden="true" />
@@ -245,7 +244,7 @@ export function ProphetsScene() {
                     </dt>
                     <dd
                       className="font-display mt-2 text-lg leading-snug"
-                      style={{ color: prophet.accent }}
+                      style={{ color: ac(prophet.accent) }}
                     >
                       {point.lesson}
                     </dd>

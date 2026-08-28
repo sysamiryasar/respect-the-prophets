@@ -205,7 +205,7 @@ export default function SceneStepper({
                     className="block h-1.5 rounded-full transition-all duration-500"
                     style={{
                       width: k === i ? '1.75rem' : '0.375rem',
-                      background: k === i ? accent : 'rgba(185,177,163,.28)',
+                      background: k === i ? accent : 'rgb(var(--ivory-dim-rgb) / .28)',
                       boxShadow: k === i ? `0 0 14px ${accent}` : 'none',
                     }}
                   />
@@ -222,8 +222,8 @@ export default function SceneStepper({
             aria-label="Next beat"
             className="group flex h-14 w-14 shrink-0 cursor-pointer items-center justify-center border transition-all duration-400 disabled:cursor-default disabled:opacity-20"
             style={{
-              borderColor: i === last ? 'rgba(211,173,104,.25)' : `${accent}66`,
-              color: i === last ? 'rgba(211,173,104,.7)' : accent,
+              borderColor: i === last ? 'rgb(var(--gold-rgb) / .25)' : `${accent}66`,
+              color: i === last ? 'rgb(var(--gold-rgb) / .7)' : accent,
             }}
           >
             <ChevronRight

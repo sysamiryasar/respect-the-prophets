@@ -1,4 +1,4 @@
-import { Volume2, VolumeX, Waves, Zap } from 'lucide-react'
+import { Moon, Sun, Volume2, VolumeX, Waves, Zap } from 'lucide-react'
 import { useJourney } from '../lib/journey'
 
 /**
@@ -9,10 +9,26 @@ import { useJourney } from '../lib/journey'
  * audio payload, while keeping the interface a real stem set would use.
  */
 export default function AudioControls() {
-  const { soundOn, toggleSound, motionPref, toggleMotion } = useJourney()
+  const { soundOn, toggleSound, motionPref, toggleMotion, theme, toggleTheme } = useJourney()
 
   return (
     <div className="flex items-center gap-1.5">
+      <button
+        type="button"
+        onClick={toggleTheme}
+        data-cursor="hover"
+        aria-pressed={theme === 'dark'}
+        aria-label={theme === 'dark' ? 'Switch to the light theme' : 'Switch to the night theme'}
+        title={theme === 'dark' ? 'Night' : 'Parchment'}
+        className="flex h-9 w-9 cursor-pointer items-center justify-center border border-gold/20 text-ivory-dim/55 transition-all duration-500 hover:border-gold/50 hover:text-gold-soft"
+      >
+        {theme === 'dark' ? (
+          <Moon size={14} strokeWidth={1.5} aria-hidden="true" />
+        ) : (
+          <Sun size={14} strokeWidth={1.5} aria-hidden="true" />
+        )}
+      </button>
+
       <button
         type="button"
         onClick={toggleSound}

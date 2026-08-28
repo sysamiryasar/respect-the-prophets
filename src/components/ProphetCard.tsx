@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import { useRef, type MouseEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from 'framer-motion'
@@ -42,7 +43,7 @@ export default function ProphetCard({
   const rotateX = useTransform(sy, [0, 1], [-7, 7])
   const glowX = useTransform(sx, (v) => `${(v * 100).toFixed(2)}%`)
   const glowY = useTransform(sy, (v) => `${(v * 100).toFixed(2)}%`)
-  const spotlight = useMotionTemplate`radial-gradient(220px circle at ${glowX} ${glowY}, ${prophet.accent}2e, transparent 72%)`
+  const spotlight = useMotionTemplate`radial-gradient(220px circle at ${glowX} ${glowY}, ${ac(prophet.accent)}2e, transparent 72%)`
 
   const onMove = (e: MouseEvent<HTMLAnchorElement>) => {
     if (!interactive || !ref.current) return
@@ -92,7 +93,7 @@ export default function ProphetCard({
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'linear-gradient(to bottom, rgba(4,7,11,.6), rgba(4,7,11,.85) 55%, rgba(4,7,11,.96))',
+            'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.6 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.85 * var(--scrim-k))) 55%, rgb(var(--ink-rgb) / calc(.96 * var(--scrim-k))))',
         }}
       />
 
@@ -108,7 +109,7 @@ export default function ProphetCard({
       <span
         aria-hidden="true"
         className="absolute top-0 left-0 h-px w-0 transition-all duration-700 ease-[cubic-bezier(.16,1,.3,1)] group-hover:w-full"
-        style={{ background: `linear-gradient(90deg, transparent, ${prophet.accent}, transparent)` }}
+        style={{ background: `linear-gradient(90deg, transparent, ${ac(prophet.accent)}, transparent)` }}
       />
 
       <span className="relative block p-6 sm:p-7">
@@ -129,14 +130,14 @@ export default function ProphetCard({
         <span
           className="mt-5 flex h-16 w-16 items-center justify-center rounded-full border transition-all duration-700 group-hover:scale-110"
           style={{
-            borderColor: `${prophet.accent}44`,
-            background: `radial-gradient(circle, ${prophet.accent}1a, transparent 70%)`,
+            borderColor: `${ac(prophet.accent)}44`,
+            background: `radial-gradient(circle, ${ac(prophet.accent)}1a, transparent 70%)`,
           }}
         >
           <ProphetGlyph
             id={prophet.id}
             className="h-8 w-8 transition-transform duration-700 group-hover:rotate-[6deg]"
-            color={prophet.accent}
+            color={ac(prophet.accent)}
           />
         </span>
 
@@ -168,7 +169,7 @@ export default function ProphetCard({
 
         <span
           className="mt-6 flex items-center gap-2 text-[0.62rem] tracking-[0.3em] uppercase transition-colors duration-500"
-          style={{ color: `${prophet.accent}cc` }}
+          style={{ color: `${ac(prophet.accent)}cc` }}
         >
           Enter the scene
           <span

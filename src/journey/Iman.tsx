@@ -4,8 +4,9 @@ import { ArrowRight } from 'lucide-react'
 import { PILLARS } from '../data/content'
 import { useJourney } from '../lib/journey'
 import ParticleField from '../components/visuals/ParticleField'
+import Plate from '../components/Plate'
 import { GeometricPattern, Rosette } from '../components/visuals/GeometricPattern'
-import { Grain, Vignette } from '../components/ui'
+
 import { Eyebrow, Hotspot, InfoPanel, Statement } from './kit'
 
 const SHORT: Record<string, string> = {
@@ -34,9 +35,10 @@ export function ImanScene() {
       id="iman"
       data-scene="iman"
       aria-label="The six pillars of iman"
-      className="relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-24"
+      className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-24"
     >
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+        <Plate id="ch-pillars" opacity={0.45} />
         <AnimatePresence mode="wait">
           <motion.div
             key={active?.id ?? 'idle'}
@@ -47,18 +49,16 @@ export function ImanScene() {
             className="absolute inset-0"
             style={{
               background: active?.highlight
-                ? 'radial-gradient(78% 62% at 50% 48%, rgba(211,173,104,.24), rgba(4,7,11,1) 72%)'
+                ? 'radial-gradient(78% 62% at 50% 48%, rgb(var(--gold-rgb) / .24), rgb(var(--ink-rgb) / 1) 72%)'
                 : active
-                  ? 'radial-gradient(78% 62% at 50% 48%, rgba(13,58,51,.4), rgba(4,7,11,1) 74%)'
-                  : 'radial-gradient(78% 62% at 50% 48%, rgba(16,28,51,.52), rgba(4,7,11,1) 76%)',
+                  ? 'radial-gradient(78% 62% at 50% 48%, rgb(var(--emerald-rgb) / .4), rgb(var(--ink-rgb) / 1) 74%)'
+                  : 'radial-gradient(78% 62% at 50% 48%, rgb(var(--navy-2-rgb) / .52), rgb(var(--ink-rgb) / 1) 76%)',
             }}
           />
         </AnimatePresence>
         <ParticleField weather="stars" density={1.3} color="#e7cd9b" opacity={0.75} />
         <GeometricPattern variant="khatam" opacity={0.035} scale={190} color="#d3ad68" drift={!reduced} />
       </div>
-      <Vignette strength={0.85} />
-      <Grain opacity={0.03} />
 
       <div className="relative z-30 w-full max-w-6xl">
         <div className="text-center">
@@ -95,7 +95,7 @@ export function ImanScene() {
                     y1="50"
                     x2={50 + Math.cos(a) * RADIUS}
                     y2={50 + Math.sin(a) * RADIUS}
-                    stroke={p.highlight ? '#d3ad68' : '#8b6a42'}
+                    stroke={p.highlight ? 'var(--color-gold)' : 'var(--color-bronze)'}
                     strokeWidth={on ? 0.55 : 0.25}
                     strokeOpacity={open ? (on ? 0.9 : 0.08) : p.highlight ? 0.6 : 0.28}
                     style={{ transition: 'stroke-opacity .8s, stroke-width .8s' }}
@@ -121,7 +121,7 @@ export function ImanScene() {
               <span
                 aria-hidden="true"
                 className="absolute top-1/2 left-1/2 h-28 w-28 -translate-x-1/2 -translate-y-1/2 rounded-full blur-2xl"
-                style={{ background: 'radial-gradient(circle, rgba(246,229,191,.4), transparent 70%)' }}
+                style={{ background: 'radial-gradient(circle, rgb(var(--gold-bright-rgb) / .4), transparent 70%)' }}
               />
               <p className="font-arabic relative text-2xl text-gold-soft/80 sm:text-3xl" lang="ar">
                 إيمان
@@ -138,7 +138,7 @@ export function ImanScene() {
                 <Hotspot
                   key={p.id}
                   label={SHORT[p.id] ?? p.title}
-                  accent={p.highlight ? '#f6e5bf' : '#d3ad68'}
+                  accent={p.highlight ? 'var(--color-gold-bright)' : 'var(--color-gold)'}
                   size={p.highlight ? 'lg' : 'md'}
                   index={String(p.index)}
                   active={open === p.id}
@@ -161,7 +161,7 @@ export function ImanScene() {
                   key={active.id}
                   title={active.title}
                   arabic={active.arabic}
-                  accent={active.highlight ? '#f6e5bf' : '#d3ad68'}
+                  accent={active.highlight ? 'var(--color-gold-bright)' : 'var(--color-gold)'}
                   footnote={active.short}
                 >
                   {active.body}

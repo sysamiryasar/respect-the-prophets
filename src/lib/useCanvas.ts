@@ -30,11 +30,41 @@ interface Options {
  *  - paused when the tab is hidden
  *  - `still` renders one frame and stops (reduced-motion path)
  */
+/* ------------------------------------------------------------------ *
+ * One requestAnimationFrame loop drives every canvas on the page.
+ *
+ * Each field used to own its own rAF; a page with twenty of them paid the
+ * scheduling cost twenty times over and gave the browser no chance to skip
+ * the ones that are off screen.
+ * ------------------------------------------------------------------ */
+type Ticker = (now: number) => void
+const tickers = new Set<Ticker>()
+let rafId = 0
+
+function pump(now: number) {
+  rafId = tickers.size ? requestAnimationFrame(pump) : 0
+  for (const t of tickers) t(now)
+}
+
+function subscribe(t: Ticker) {
+  tickers.add(t)
+  if (!rafId) rafId = requestAnimationFrame(pump)
+  return () => {
+    tickers.delete(t)
+    if (!tickers.size && rafId) {
+      cancelAnimationFrame(rafId)
+      rafId = 0
+    }
+  }
+}
+
 export function useCanvas<T extends HTMLCanvasElement>({
   setup,
   draw,
   still = false,
-  maxDpr = 2,
+  // 1.5 is indistinguishable for soft particle sprites and costs ~45% fewer
+  // pixels per frame than 2.
+  maxDpr = 1.5,
   deps = [],
 }: Options) {
   const ref = useRef<T | null>(null)
@@ -51,7 +81,6 @@ export function useCanvas<T extends HTMLCanvasElement>({
 
     let w = 0
     let h = 0
-    let raf = 0
     let start = 0
     let prev = 0
     let frame = 0
@@ -84,7 +113,6 @@ export function useCanvas<T extends HTMLCanvasElement>({
     }
 
     const loop = (now: number) => {
-      raf = requestAnimationFrame(loop)
       if (!visible || !onScreen) {
         prev = now
         return
@@ -136,14 +164,15 @@ export function useCanvas<T extends HTMLCanvasElement>({
     }
     document.addEventListener('visibilitychange', onVisibility)
 
+    let unsubscribe: (() => void) | undefined
     if (still) {
       renderOnce()
     } else {
-      raf = requestAnimationFrame(loop)
+      unsubscribe = subscribe(loop)
     }
 
     return () => {
-      cancelAnimationFrame(raf)
+      unsubscribe?.()
       settle.forEach(cancelAnimationFrame)
       window.clearTimeout(settleTimer)
       window.removeEventListener('resize', onResize)

@@ -1,3 +1,4 @@
+import { ac } from '../lib/art'
 import type { ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
@@ -47,17 +48,17 @@ export default function ChapterPage({
         <div
           className="absolute inset-0"
           style={{
-            background: `linear-gradient(to bottom, rgba(4,7,11,.45), rgba(4,7,11,.72) 55%, rgba(4,7,11,.94))`,
+            background: `linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.45 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.72 * var(--scrim-k))) 55%, rgb(var(--ink-rgb) / calc(.94 * var(--scrim-k))))`,
           }}
         />
         <GeometricPattern
           variant="khatam"
           opacity={0.035}
           scale={170}
-          color={chapter.accent}
+          color={ac(chapter.accent)}
           drift={!reduced}
         />
-        <ParticleField weather={weather} density={0.7} color={chapter.accent} opacity={0.5} />
+        <ParticleField weather={weather} density={0.7} color={ac(chapter.accent)} opacity={0.5} />
         <Vignette strength={0.7} />
         <Grain opacity={0.03} />
       </div>
@@ -66,7 +67,7 @@ export default function ChapterPage({
       <div className="pointer-events-none absolute top-24 left-4 z-20 flex items-baseline gap-3 sm:left-10">
         <span
           className="font-display text-xs tracking-[0.4em] tabular-nums"
-          style={{ color: `${chapter.accent}88` }}
+          style={{ color: `${ac(chapter.accent)}88` }}
         >
           {String(index + 1).padStart(2, '0')}
         </span>
@@ -97,7 +98,7 @@ export default function ChapterPage({
             <p className="mx-auto mt-7 max-w-2xl text-sm leading-relaxed text-ivory-dim/70 sm:text-base">
               {chapter.standfirst}
             </p>
-            <OrnamentDivider className="mt-12" color={chapter.accent} />
+            <OrnamentDivider className="mt-12" color={ac(chapter.accent)} />
           </motion.header>
         )}
 
@@ -112,7 +113,7 @@ export default function ChapterPage({
       </div>
 
       {/* ── on to the next chapter ────────────────────────────────── */}
-      <ChapterFooter prev={prev} next={next} index={index} accent={chapter.accent} />
+      <ChapterFooter prev={prev} next={next} index={index} accent={ac(chapter.accent)} />
     </div>
   )
 }
