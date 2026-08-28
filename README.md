@@ -39,16 +39,23 @@ pages. Ten named sections run **Intro → Why → Iman → Prophets → Stories 
 Lessons → Muhammad ﷺ → Action → Final**, tracked by a top progress bar you can click to
 jump anywhere.
 
+**About 12 minutes end to end**, and the reader sets the pace — roughly 22 screens
+of scroll and ~90 things to click.
+
 It alternates two modes on purpose:
 
-- **Pinned cinematic runs** — the frame sticks to the viewport while the artwork and
-  typography advance with your scroll. The desert road travels forward, Nuh's storm
-  rises, Ibrahim's fire cools into light, **Musa's sea opens into two walls of water**,
-  and the finale fades night into dawn.
-- **Stable interactive stages** — where you're meant to click and explore, nothing moves
-  under you: four glowing points on the road, the six-pillar constellation, a golden
-  path of seven prophets, three expanding trials, an eight-spoke wheel of character that
-  turns your choice to the top, five floating qualities, and a five-step path upward.
+- **Two pinned cinematic runs**, kept for the moments that earn the scroll: the desert
+  road travelling forward, and the reveal of the final Messenger ﷺ over the Ka'bah.
+- **Everything else is a stage you click through.** Each prophet's story is a single
+  screen advanced beat by beat — Musa's sea opens, Ibrahim's fire cools into light,
+  Nuh's storm rises — as are the four points on the road, the six-pillar constellation,
+  the golden path of seven prophets, three expanding trials, an eight-spoke wheel that
+  turns your choice to the top, sixteen Qur'anic verses, five floating qualities, a
+  five-step path upward, and the finale's fade from night into dawn.
+
+The stories used to be scroll-pinned: four screens of scrolling to read four sentences,
+and the whole journey ran to 41 screens. Turning them into stages roughly halved the
+length and put the reader in control at the same time.
 
 Yusuf's story is a **draggable horizontal journey** — well → prison → palace — that
 becomes a vertical list on mobile.

@@ -1,6 +1,6 @@
 import { ac } from '../lib/art'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AnimatePresence, motion, useTransform, type MotionValue } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { STORY_ENVIRONMENTS, YUSUF_STAGES, type StoryEnvironment } from '../data/journey'
 import { PROPHET_BY_ID } from '../data/prophets'
 import { useJourney } from '../lib/journey'
@@ -9,16 +9,8 @@ import ParticleField from '../components/visuals/ParticleField'
 import Plate from '../components/Plate'
 import { GeometricPattern } from '../components/visuals/GeometricPattern'
 
-import {
-  Beat,
-  Eyebrow,
-  InfoPanel,
-  Scene,
-  SceneRail,
-  SceneVeil,
-  Statement,
-  useRevealOnSelect,
-} from './kit'
+import SceneStepper, { type Step } from '../components/SceneStepper'
+import { Eyebrow, Statement } from './kit'
 
 export function StoriesScene() {
   return (
@@ -71,216 +63,91 @@ function StoryOpening() {
  * One prophet's environment: a pinned cinematic run, then a stable strip of
  * interactive reveals on the same backdrop.
  */
+/**
+ * One prophet's environment, as a stage rather than a scroll track.
+ *
+ * This used to be a 320svh pinned run followed by a separate strip of
+ * reveals — four screens of scrolling to read four sentences. It is now a
+ * single screen the reader clicks through, which is both shorter and puts
+ * them in control of the pace. The artwork still responds to the beat.
+ */
 function StoryEnvironmentScene({ story, order }: { story: StoryEnvironment; order: number }) {
-  const { reduced, cue } = useJourney()
+  const { reduced } = useJourney()
   const p = PROPHET_BY_ID[story.id]
-  const [open, setOpen] = useState<number | null>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
-  useRevealOnSelect(panelRef, open)
-  const isMusa = story.id === 'musa'
+  const [progress, setProgress] = useState(0)
+  const onStep = useCallback((_i: number, v: number) => setProgress(v), [])
 
-  return (
-    <>
-      <Scene
-        id={`story-${story.id}`}
-        height={isMusa ? 420 : 320}
-        label={`${p.name} ${p.honorific} — ${story.environment}`}
-        backdrop={(prog, step) => (
-          <StoryBackdrop id={story.id} progress={prog} step={step} accent={ac(p.accent)} weather={p.weather} />
-        )}
-        flat={
-          <div className="relative overflow-hidden px-5 py-20">
-            <div aria-hidden="true" className="absolute inset-0 -z-10 opacity-45">
-              <SceneArt art={story.id} progress={0.8} accent={ac(p.accent)} />
-            </div>
-            <div className="absolute inset-0 -z-10 bg-ink/70" aria-hidden="true" />
-            <div className="relative mx-auto max-w-3xl text-center">
-              <Eyebrow color={ac(p.accent)}>{story.environment}</Eyebrow>
-              <h3 className="font-display mt-5 text-[clamp(2rem,7vw,4rem)] leading-none font-light uppercase">
-                {story.title} <span className="text-[0.3em] text-gold/60">{p.honorific}</span>
-              </h3>
-              <p className="font-display mt-8 text-xl leading-relaxed font-light text-ivory/85 italic">
-                {story.line}
-              </p>
-            </div>
-          </div>
-        }
-      >
-        {(prog) => (
-          <>
-            <Beat progress={prog} from={0} to={0.34}>
-              <Eyebrow color={ac(p.accent)}>
-                Scene {String(order + 1).padStart(2, '0')} · {story.environment}
-              </Eyebrow>
-              <p className="font-arabic mt-7 text-3xl sm:text-5xl" style={{ color: ac(p.accent) }} lang="ar">
-                {p.arabic}
-              </p>
-              <h3 className="font-display mt-4 text-[clamp(2.4rem,10vw,7rem)] leading-none font-light uppercase">
-                {story.title}
-                <span className="ml-3 align-middle text-[0.28em] tracking-normal text-gold/60">
-                  {p.honorific}
-                </span>
-              </h3>
-            </Beat>
-
-            {isMusa ? (
-              <>
-                <Beat progress={prog} from={0.34} to={0.6}>
-                  <Statement size="md">
-                    The sea ahead. Pharaoh’s army closing behind.
-                    <br />
-                    His people said: we are surely overtaken.
-                  </Statement>
-                </Beat>
-                <Beat progress={prog} from={0.6} to={0.8}>
-                  <Statement size="xl" gilded>
-                    The sea
-                    <br />
-                    opens
-                  </Statement>
-                </Beat>
-                <Beat progress={prog} from={0.8} to={1}>
-                  <Statement size="md" className="italic">
-                    “{story.line}”
-                  </Statement>
-                  <p className="mt-7 text-[0.66rem] tracking-[0.3em] text-gold/55 uppercase">
-                    Surah Ash-Shu‘ara · 26:62
-                  </p>
-                </Beat>
-              </>
-            ) : (
-              <Beat progress={prog} from={0.34} to={1}>
-                <Statement size="md" className="italic">
-                  “{story.line}”
-                </Statement>
-              </Beat>
-            )}
-          </>
-        )}
-      </Scene>
-
-      {/* ── the reveals ──────────────────────────────────────────── */}
-      <section
-        aria-label={`What ${p.name} ${p.honorific} teaches`}
-        className="cv-80 relative flex min-h-[80svh] w-full items-center justify-center overflow-hidden px-5 py-20"
-      >
-        <div aria-hidden="true" className="absolute inset-0">
-          <Plate id={story.id} opacity={0.55} />
-          <div className="absolute inset-0 opacity-55">
-            <SceneArt art={story.id} progress={0.9} accent={ac(p.accent)} />
-          </div>
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.72 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.84 * var(--scrim-k))) 50%, rgb(var(--ink-rgb) / calc(.96 * var(--scrim-k))))',
-            }}
-          />
-          <ParticleField weather={p.weather} density={0.6} color={ac(p.accent)} opacity={0.4} />
-        </div>
-
-        <div className="relative z-30 w-full max-w-4xl">
-          <p className="text-center text-[0.66rem] tracking-[0.4em] uppercase" style={{ color: `${ac(p.accent)}bb` }}>
-            {story.title} {p.honorific} · what it teaches
+  const steps: Step[] = [
+    {
+      content: (
+        <div>
+          <p className="font-arabic text-3xl sm:text-5xl" style={{ color: ac(p.accent) }} lang="ar">
+            {p.arabic}
           </p>
-
-          <ul className="mt-10 flex flex-wrap justify-center gap-3">
-            {story.reveals.map((r, i) => {
-              const on = open === i
-              return (
-                <li key={r.title}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      cue(on ? 'close' : 'select')
-                      setOpen(on ? null : i)
-                    }}
-                    onMouseEnter={() => cue('hover')}
-                    data-cursor="explore"
-                    aria-pressed={on}
-                    className="group relative cursor-pointer border px-6 py-4 text-[0.7rem] tracking-[0.24em] uppercase transition-all duration-500"
-                    style={{
-                      borderColor: on ? ac(p.accent) : `${ac(p.accent)}3a`,
-                      color: on ? 'var(--color-gold-bright)' : `${ac(p.accent)}dd`,
-                      background: on ? `${ac(p.accent)}1c` : 'rgb(var(--ink-rgb) / .5)',
-                      boxShadow: on ? `0 0 40px -10px ${ac(p.accent)}` : 'none',
-                    }}
-                  >
-                    {r.title}
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-
-          <div ref={panelRef} className="mt-10 flex min-h-[13rem] justify-center">
-            <AnimatePresence mode="wait">
-              {open !== null ? (
-                <InfoPanel
-                  key={open}
-                  title={story.reveals[open].title}
-                  accent={ac(p.accent)}
-                  onClose={() => {
-                    cue('close')
-                    setOpen(null)
-                  }}
-                >
-                  {story.reveals[open].body}
-                </InfoPanel>
-              ) : (
-                <motion.p
-                  key="prompt"
-                  initial={reduced ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, transition: { duration: reduced ? 0 : 0.18 } }}
-                  className="self-center text-[0.66rem] tracking-[0.34em] text-ivory-dim/40 uppercase"
-                >
-                  Select one to reveal it
-                </motion.p>
-              )}
-            </AnimatePresence>
-          </div>
+          <h3 className="font-display mt-4 text-[clamp(2.2rem,9vw,5.5rem)] leading-none font-light uppercase">
+            {story.title}
+            <span className="ml-3 align-middle text-[0.28em] tracking-normal text-gold/60">
+              {p.honorific}
+            </span>
+          </h3>
+          <p className="font-display mt-7 text-[clamp(1.1rem,3vw,1.7rem)] leading-relaxed font-light text-ivory/85 italic">
+            “{story.line}”
+          </p>
         </div>
-      </section>
-    </>
-  )
-}
+      ),
+    },
+    ...story.reveals.map((r) => ({
+      label: r.title,
+      content: (
+        <p className="font-display text-[clamp(1.15rem,3.4vw,2.1rem)] leading-[1.45] font-light text-ivory/90">
+          {r.body}
+        </p>
+      ),
+    })),
+  ]
 
-/* ------------------------------------------------------------------ */
-
-function StoryBackdrop({
-  id,
-  progress,
-  step,
-  accent,
-  weather,
-}: {
-  id: StoryEnvironment['id']
-  progress: MotionValue<number>
-  step: number
-  accent: string
-  weather: 'stars' | 'rain' | 'sand' | 'dust' | 'embers' | 'motes'
-}) {
-  const scale = useTransform(progress, [0, 1], [1.14, 1.02])
-  const y = useTransform(progress, [0, 1], ['-3%', '3%'])
   return (
-    <div aria-hidden="true" className="absolute inset-0">
-      <Plate id={id} opacity={0.9} />
-      <motion.div className="absolute inset-0 opacity-85" style={{ scale, y }}>
-        <SceneArt art={id} progress={step / 14} accent={accent} />
-      </motion.div>
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.5 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.24 * var(--scrim-k))) 38%, rgb(var(--ink-rgb) / calc(.86 * var(--scrim-k))))',
-        }}
-      />
-      <ParticleField weather={weather} density={0.85} color={accent} opacity={0.55} />
-      <GeometricPattern variant="lattice" opacity={0.02} scale={140} color={accent} />
-      <SceneVeil progress={progress} />
-      <SceneRail progress={progress} accent={accent} />
-    </div>
+    <section
+      id={`story-${story.id}`}
+      data-scene={`story-${story.id}`}
+      aria-label={`${p.name} ${p.honorific} — ${story.environment}`}
+      className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-16"
+    >
+      <div aria-hidden="true" className="absolute inset-0">
+        <Plate id={story.id} opacity={0.85} />
+        <motion.div
+          className="absolute inset-0 opacity-85"
+          animate={reduced ? undefined : { scale: 1 + progress * 0.06 }}
+          transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <SceneArt art={story.id} progress={progress} accent={ac(p.accent)} />
+        </motion.div>
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to bottom, rgb(var(--ink-rgb) / calc(.6 * var(--scrim-k))), rgb(var(--ink-rgb) / calc(.42 * var(--scrim-k))) 42%, rgb(var(--ink-rgb) / calc(.9 * var(--scrim-k))))',
+          }}
+        />
+        <ParticleField weather={p.weather} density={0.75} color={ac(p.accent)} opacity={0.5} />
+        <GeometricPattern variant="lattice" opacity={0.02} scale={140} color={ac(p.accent)} />
+      </div>
+
+      <div className="relative z-30 w-full max-w-4xl">
+        <div className="text-center">
+          <Eyebrow color={ac(p.accent)}>
+            Scene {String(order + 1).padStart(2, '0')} · {story.environment}
+          </Eyebrow>
+        </div>
+        <SceneStepper
+          steps={steps}
+          accent={ac(p.accent)}
+          onStep={onStep}
+          label={`${p.name} ${p.honorific}, one beat at a time`}
+          className="mt-4"
+        />
+      </div>
+    </section>
   )
 }
 

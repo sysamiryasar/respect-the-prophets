@@ -160,6 +160,9 @@ export function IntroScene() {
           <GoldButton size="lg" onClick={begin}>
             Begin the Journey
           </GoldButton>
+          <p className="mt-6 text-[0.64rem] tracking-[0.34em] text-ivory-dim/45 uppercase">
+            Ten chapters · about 12 minutes · you set the pace
+          </p>
         </motion.div>
       </div>
 
@@ -191,7 +194,7 @@ export function WhyScene() {
       {/* ── the road moving forward ─────────────────────────────── */}
       <Scene
         id="why"
-        height={340}
+        height={185}
         label="Why do we respect the Prophets"
         backdrop={(p, step) => (
           <BackdropPath progress={p} step={step} />

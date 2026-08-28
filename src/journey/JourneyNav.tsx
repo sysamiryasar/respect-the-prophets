@@ -128,7 +128,7 @@ export default function JourneyNav() {
                         onMouseEnter={() => cue('hover')}
                         data-cursor="hover"
                         aria-current={on ? 'true' : undefined}
-                        className={`relative cursor-pointer px-2.5 py-2 text-[0.62rem] tracking-[0.2em] uppercase transition-colors duration-400 ${
+                        className={`relative cursor-pointer px-2.5 py-2 text-[0.62rem] tracking-[0.2em] whitespace-nowrap uppercase transition-colors duration-400 ${
                           on
                             ? 'text-gold-bright'
                             : done
@@ -146,7 +146,10 @@ export default function JourneyNav() {
                         )}
                       </button>
                       {i < JOURNEY_NAV.length - 1 && (
-                        <span aria-hidden="true" className="text-[0.55rem] text-gold/20">
+                        <span
+                          aria-hidden="true"
+                          className="hidden text-[0.55rem] text-gold/20 2xl:inline"
+                        >
                           →
                         </span>
                       )}
@@ -156,7 +159,7 @@ export default function JourneyNav() {
               </ol>
 
               <div className="flex items-center gap-2 sm:gap-3">
-                <div className="hidden items-center gap-2 xl:flex" aria-label={`Section ${step} of ${total}`}>
+                <div className="hidden items-center gap-2 2xl:flex" aria-label={`Section ${step} of ${total}`}>
                   <span className="font-display text-[0.64rem] text-gold tabular-nums">{step}</span>
                   <span aria-hidden="true" className="relative block h-px w-12 bg-gold/15">
                     <span

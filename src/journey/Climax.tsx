@@ -1,5 +1,5 @@
 import { ac } from '../lib/art'
-import { useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { AnimatePresence, motion, useTransform, type MotionValue } from 'framer-motion'
 import { RotateCcw } from 'lucide-react'
 import { QUALITIES, RESPECT_STEPS, FINAL_LINES } from '../data/journey'
@@ -9,7 +9,8 @@ import { useJourney } from '../lib/journey'
 import SceneArt from '../components/visuals/SceneArt'
 import ParticleField from '../components/visuals/ParticleField'
 import Plate from '../components/Plate'
-import { GeometricPattern, Rosette, OrnamentDivider } from '../components/visuals/GeometricPattern'
+import { GeometricPattern, OrnamentDivider } from '../components/visuals/GeometricPattern'
+import SceneStepper, { type Step } from '../components/SceneStepper'
 import { GoldButton, SourceTag } from '../components/ui'
 import {
   Beat,
@@ -41,7 +42,7 @@ export function MuhammadScene() {
       {/* ── the reveal ───────────────────────────────────────────── */}
       <Scene
         id="muhammad-reveal"
-        height={380}
+        height={210}
         label="Muhammad ﷺ, the final Messenger of Allah"
         backdrop={(prog, step) => <MuhammadBackdrop progress={prog} step={step} />}
         flat={
@@ -347,80 +348,106 @@ export function ActionScene() {
 
 export function FinalScene() {
   const { reduced, cue } = useJourney()
+  const [progress, setProgress] = useState(0)
+  const onStep = useCallback((_i: number, v: number) => setProgress(v), [])
 
   const restart = () => {
     cue('open')
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' })
   }
 
-  const WINDOWS = FINAL_LINES.length + 2
+  const steps: Step[] = [
+    ...FINAL_LINES.map((line, i) => ({
+      content: (
+        <p
+          className={`font-display font-light ${
+            i === FINAL_LINES.length - 1
+              ? 'text-[clamp(1.9rem,7vw,4rem)] text-gold-soft'
+              : 'text-[clamp(1.6rem,6vw,3.4rem)] text-ivory/60'
+          }`}
+        >
+          {line}
+        </p>
+      ),
+    })),
+    {
+      content: (
+        <p className="font-display text-gilded anim-shimmer text-[clamp(2.6rem,13vw,9rem)] leading-none font-light uppercase">
+          Worship
+          <br />
+          Allah.
+        </p>
+      ),
+    },
+    {
+      content: <ClosingLines />,
+      after: (
+        <GoldButton arrow="" size="lg" onClick={restart}>
+          <span className="inline-flex items-center gap-3">
+            <RotateCcw size={14} strokeWidth={1.5} aria-hidden="true" />
+            Experience again
+          </span>
+        </GoldButton>
+      ),
+    },
+  ]
 
   return (
     <div id="final" data-scene="final">
-      <Scene
-        id="final-scene"
-        height={WINDOWS * 90}
-        label="The final message"
-        backdrop={(prog) => <DawnBackdrop progress={prog} />}
-        flat={
-          <div className="relative overflow-hidden px-5 py-24 text-center">
-            <div aria-hidden="true" className="absolute inset-0 -z-10">
-              <Plate id="ch-final" opacity={0.7} />
-              <div className="absolute inset-0 bg-ink/70" />
-            </div>
-            <ul className="space-y-4">
-              {FINAL_LINES.map((l) => (
-                <li key={l} className="font-display text-2xl font-light text-ivory/70">
-                  {l}
-                </li>
-              ))}
-            </ul>
-            <p className="font-display text-gilded mt-10 text-[clamp(2.4rem,10vw,5rem)] leading-none font-light uppercase">
-              Worship Allah.
-            </p>
-            <ClosingLines />
-          </div>
-        }
+      <section
+        aria-label="The final message"
+        className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 pt-28 pb-16"
       >
-        {(prog) => (
-          <>
-            {FINAL_LINES.map((line, i) => (
-              <Beat key={line} progress={prog} from={i / WINDOWS} to={(i + 1) / WINDOWS}>
-                <Statement size={i === FINAL_LINES.length - 1 ? 'lg' : 'md'}>
-                  <span className={i === FINAL_LINES.length - 1 ? 'text-gold-soft' : 'text-ivory/60'}>
-                    {line}
-                  </span>
-                </Statement>
-              </Beat>
-            ))}
+        {/* Night gives way to dawn as the reader advances, rather than as
+            they scroll — same fade, a fifth of the page height. */}
+        <div aria-hidden="true" className="absolute inset-0">
+          <Plate id="ch-final" opacity={0.85} />
+          <motion.div
+            className="absolute inset-0"
+            animate={{ opacity: 1 - progress * 0.9 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <ParticleField weather="stars" density={1.1} color="#e7cd9b" opacity={1} />
+          </motion.div>
+          <motion.div
+            className="absolute inset-x-0 bottom-0 h-[70%]"
+            animate={{ opacity: 0.15 + progress * 0.75 }}
+            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              background:
+                'linear-gradient(to top, rgb(var(--glow-rgb) / .3), rgb(var(--glow-rgb) / .1) 42%, transparent 75%)',
+            }}
+          />
+          <motion.div
+            className="absolute top-[74%] left-1/2 h-[46vmin] w-[46vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
+            animate={{ scale: 0.6 + progress * 1.5, opacity: 0.5 + progress * 0.4 }}
+            transition={{ duration: 1.3, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+              background:
+                'radial-gradient(circle, rgb(var(--glow-rgb) / .8) 0%, rgb(var(--glow-rgb) / .28) 18%, transparent 66%)',
+            }}
+          />
+          <div
+            className="absolute inset-x-0 top-[16%] h-[46%]"
+            style={{
+              background:
+                'radial-gradient(60% 100% at 50% 50%, rgb(var(--ink-rgb) / calc(.6 * var(--scrim-k))), transparent 78%)',
+            }}
+          />
+        </div>
 
-            <Beat progress={prog} from={FINAL_LINES.length / WINDOWS} to={(FINAL_LINES.length + 1) / WINDOWS}>
-              <Statement size="xl" gilded>
-                Worship
-                <br />
-                Allah.
-              </Statement>
-            </Beat>
+        <div className="relative z-30 w-full max-w-3xl text-center">
+          <SceneStepper
+            steps={steps}
+            accent="var(--color-gold)"
+            onStep={onStep}
+            label="The final message"
+            stage="compact"
+          />
+        </div>
+      </section>
 
-            <Beat progress={prog} from={(FINAL_LINES.length + 1) / WINDOWS} to={1} hold live>
-              <div className="max-w-2xl">
-                <ClosingLines />
-                <div className="pointer-events-auto mt-12">
-                  <GoldButton arrow="" size="lg" onClick={restart}>
-                    <span className="inline-flex items-center gap-3">
-                      <RotateCcw size={14} strokeWidth={1.5} aria-hidden="true" />
-                      Experience again
-                    </span>
-                  </GoldButton>
-                </div>
-              </div>
-            </Beat>
-          </>
-        )}
-      </Scene>
-
-      {/* colophon, after the pin */}
-      <section className="relative z-10 mx-auto max-w-3xl px-5 pb-24 text-center">
+      <section className="relative z-10 mx-auto max-w-3xl px-5 pb-20 text-center">
         <OrnamentDivider className="mb-8" />
         <p className="mx-auto max-w-xl text-[0.72rem] leading-relaxed text-ivory-dim/45">
           An educational project. Qur’anic passages are quoted with their surah and ayah. English
@@ -459,53 +486,3 @@ function ClosingLines() {
   )
 }
 
-/** Night fading into dawn: the stars go out, the horizon fills with gold. */
-function DawnBackdrop({ progress }: { progress: MotionValue<number> }) {
-  const starOpacity = useTransform(progress, [0, 0.55, 0.85], [0.8, 0.4, 0])
-  const dawn = useTransform(progress, [0.3, 0.85, 1], [0, 0.75, 1])
-  const lightScale = useTransform(progress, [0, 0.6, 1], [0.5, 1.1, 1.9])
-  const rosette = useTransform(progress, [0.7, 1], [0, 0.22])
-
-  return (
-    <div aria-hidden="true" className="absolute inset-0">
-      <Plate id="ch-final" opacity={0.85} />
-      <motion.div className="absolute inset-0" style={{ opacity: starOpacity }}>
-        <ParticleField weather="stars" density={1.3} color="#e7cd9b" opacity={1} />
-      </motion.div>
-      <motion.div
-        className="absolute inset-x-0 bottom-0 h-[70%]"
-        style={{
-          opacity: dawn,
-          background:
-            'linear-gradient(to top, rgb(var(--glow-rgb) / .34), rgb(var(--gold-rgb) / .12) 42%, transparent 75%)',
-        }}
-      />
-      {/* The light sits low, on the horizon — the words live in the calm
-          middle of the frame, not on top of the brightest pixel. */}
-      <motion.div
-        className="absolute top-[72%] left-1/2 h-[52vmin] w-[52vmin] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{
-          scale: lightScale,
-          background:
-            'radial-gradient(circle, rgb(var(--glow-rgb) / .85) 0%, rgb(var(--gold-rgb) / .28) 18%, rgb(var(--gold-rgb) / .06) 42%, transparent 68%)',
-        }}
-      />
-      <motion.div
-        className="absolute top-[72%] left-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ opacity: rosette, scale: lightScale }}
-      >
-        <Rosette className="h-[70vmin] w-[70vmin]" progress={1} />
-      </motion.div>
-      {/* a soft scrim so the statements always clear their background */}
-      <div
-        className="absolute inset-x-0 top-[18%] h-[46%]"
-        style={{
-          background:
-            'radial-gradient(60% 100% at 50% 50%, rgb(var(--ink-rgb) / .62), rgb(var(--ink-rgb) / .28) 60%, transparent 80%)',
-        }}
-      />
-      <SceneVeil progress={progress} />
-      <SceneRail progress={progress} accent="var(--color-gold)" />
-    </div>
-  )
-}

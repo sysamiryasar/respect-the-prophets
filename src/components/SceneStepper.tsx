@@ -21,6 +21,8 @@ interface Props {
   className?: string
   /** Label for the stepper region, for screen readers. */
   label: string
+  /** Height of the stage. Tighten it where the section has less to hold. */
+  stage?: 'default' | 'compact'
 }
 
 /**
@@ -39,6 +41,7 @@ export default function SceneStepper({
   children,
   className = '',
   label,
+  stage: stageSize = 'default',
 }: Props) {
   const { reduced, cue } = useJourney()
   const [i, setI] = useState(0)
@@ -129,7 +132,9 @@ export default function SceneStepper({
       >
         {/* ── the stage ──────────────────────────────────────────── */}
         <div
-          className="relative flex min-h-[58svh] items-center justify-center px-2 py-8 text-center sm:min-h-[62svh]"
+          className={`relative flex items-center justify-center px-2 py-6 text-center ${
+            stageSize === 'compact' ? 'min-h-[34svh] sm:min-h-[38svh]' : 'min-h-[52svh] sm:min-h-[56svh]'
+          }`}
           aria-live="polite"
           aria-atomic="true"
         >
