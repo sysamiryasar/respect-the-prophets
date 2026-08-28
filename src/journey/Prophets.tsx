@@ -45,7 +45,7 @@ export function ProphetsScene() {
               transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-0"
             >
-              <Plate id={prophet.id} opacity={0.55} />
+              <Plate id={prophet.id} opacity={0.68} />
             </motion.div>
           )}
         </AnimatePresence>

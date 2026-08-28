@@ -9,3 +9,10 @@ node_modules/.tmp
 
 # visual QA output
 .qa*
+
+# Source artwork dropped in for `npm run plates:import`. The exports are
+# large and the built assets in public/img are what ship; imported.json is
+# tracked so a fresh checkout still knows which plates are yours.
+art/*
+!art/README.md
+!art/imported.json

@@ -248,7 +248,7 @@ export function ActionScene() {
       className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-16"
     >
       <div aria-hidden="true" className="absolute inset-0">
-        <Plate id="ch-respect" opacity={0.5} />
+        <Plate id="ch-respect" opacity={0.62} />
         <div
           className="absolute inset-0"
           style={{ background: 'radial-gradient(80% 70% at 50% 100%, rgb(var(--gold-rgb) / .14), rgb(var(--ink-rgb) / .92) 70%)' }}

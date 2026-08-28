@@ -38,7 +38,7 @@ export function ImanScene() {
       className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center px-5 py-24"
     >
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
-        <Plate id="ch-pillars" opacity={0.45} />
+        <Plate id="ch-pillars" opacity={0.6} />
         <AnimatePresence mode="wait">
           <motion.div
             key={active?.id ?? 'idle'}

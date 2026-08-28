@@ -326,3 +326,10 @@ export function buildPlateSvg({
   <rect width="${W}" height="${H}" fill="url(#vig)"/>
 </svg>`
 }
+
+/**
+ * The skyline silhouette, exposed for the pixel renderer. Buildings only —
+ * arcaded halls, domes and minarets — and it stays SVG because the shapes
+ * are architectural, not photographic; plate-render.mjs supplies the air.
+ */
+export const skylinePath = (baseY, scale, rnd) => skyline(baseY, scale, rnd)

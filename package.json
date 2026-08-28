@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -b --noEmit false --force",
     "plates": "node scripts/build-plates.mjs",
-    "preview:pages": "node scripts/serve-pages.mjs"
+    "preview:pages": "node scripts/serve-pages.mjs",
+    "plates:import": "node scripts/import-art.mjs"
   },
   "dependencies": {
     "framer-motion": "^11.11.17",

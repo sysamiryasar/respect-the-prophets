@@ -221,7 +221,7 @@ function SceneLink({ id, dir }: { id: ArtKey; dir: 'prev' | 'next' }) {
         isNext ? 'justify-end text-right' : ''
       }`}
     >
-      <Plate id={id} opacity={0.16} className="transition-opacity duration-700 group-hover:opacity-40" />
+      <Plate id={id} opacity={0.22} className="transition-opacity duration-700 group-hover:opacity-40" />
       {!isNext && (
         <ArrowLeft
           size={20}

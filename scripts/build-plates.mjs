@@ -10,17 +10,20 @@
  * …and writes src/data/plates.ts containing a tiny inline LQIP for each, so
  * every plate can blur up instead of popping in.
  *
- * ── Replacing these with your own artwork ──────────────────────────────
- * Drop a file into public/img/ using the same base name and size suffix
- * (e.g. `musa-1600.webp`) and it is picked up with no code change. Keep the
- * 16:9 ratio. Re-running this script would overwrite them, so if you supply
- * your own, remove that id from PLATES below.
+ * The pixels come from plate-render.mjs, which renders each one properly —
+ * sky scattering, clouds, aerial perspective, wave optics, film response.
+ *
+ * ── Using your own artwork instead ─────────────────────────────────────
+ * Put your images in `art/` named after the plate — `musa.png`,
+ * `musa-light.png` — and run `npm run plates:import`. Anything it finds
+ * there wins over the render, so a Canva export drops straight in. See
+ * import-art.mjs.
  */
-import { mkdir, writeFile, readdir, rm } from 'node:fs/promises'
+import { mkdir, writeFile, readdir, readFile, rm } from 'node:fs/promises'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
-import { buildPlateSvg, setLight, W, H } from './plate-art.mjs'
+import { renderPlate, W, H } from './plate-render.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const outDir = join(root, 'public', 'img')
@@ -59,24 +62,53 @@ const PLATES = [
   { id: 'muhammad', accent: '#e8cf96', skyTop: '#03060c', skyBottom: '#0d1a1c', terrain: 'skyline', glowY: 0.62, glow: 0.55, stars: 210 },
 ]
 
+/**
+ * Ids the reader supplied their own artwork for, via `npm run plates:import`.
+ * Those are left exactly as they are — the render would otherwise overwrite
+ * them on the next build, which is a rude way to lose someone's work.
+ */
+async function importedArt() {
+  try {
+    const list = JSON.parse(await readFile(join(root, 'art', 'imported.json'), 'utf8'))
+    return new Map(list.map((e) => [e.id, e.lqip]))
+  } catch {
+    return new Map()
+  }
+}
+
 async function main() {
-  await rm(outDir, { recursive: true, force: true })
+  const custom = await importedArt()
+  // A targeted clean, so imported files survive.
+  try {
+    for (const f of await readdir(outDir)) {
+      const id = f.replace(/-(?:1600|800)\.(?:avif|webp)$/, '')
+      if (!custom.has(id)) await rm(join(outDir, f), { force: true })
+    }
+  } catch {
+    /* first run */
+  }
   await mkdir(outDir, { recursive: true })
 
   const manifest = []
+  let kept = 0
 
   for (const plate of PLATES) {
     const variants = {}
 
     // Each plate is rendered twice — night, and the parchment theme, which
-    // re-reads the very same definition through the light-mode transforms.
+    // is not the night one with a filter over it but the same landscape at a
+    // different hour, lit and graded for daylight.
     for (const light of [false, true]) {
-      setLight(light)
       const suffix = light ? '-light' : ''
-      const svg = Buffer.from(buildPlateSvg(plate))
+      if (custom.has(`${plate.id}${suffix}`)) {
+        kept++
+        continue
+      }
+      const raw = await renderPlate(plate, light)
+      const src = () => sharp(raw, { raw: { width: W, height: H, channels: 3 } })
 
       for (const w of WIDTHS) {
-        const base = sharp(svg, { density: 96 }).resize(w, Math.round((w / W) * H))
+        const base = src().resize(w, Math.round((w / W) * H))
         await base
           .clone()
           .avif({ quality: 52, effort: 6 })
@@ -88,16 +120,20 @@ async function main() {
       }
 
       // Tiny blur-up placeholder, inlined into the bundle.
-      const lqip = await sharp(svg, { density: 96 })
+      const lqip = await src()
         .resize(20, Math.round((20 / W) * H))
         .blur(1.1)
         .webp({ quality: 42 })
         .toBuffer()
       variants[light ? 'lqipLight' : 'lqip'] = `data:image/webp;base64,${lqip.toString('base64')}`
     }
-    setLight(false)
 
-    manifest.push({ id: plate.id, ...variants })
+    manifest.push({
+      id: plate.id,
+      // An imported plate keeps the placeholder built from its own image.
+      lqip: variants.lqip ?? custom.get(plate.id) ?? '',
+      lqipLight: variants.lqipLight ?? custom.get(`${plate.id}-light`) ?? variants.lqip ?? '',
+    })
     process.stdout.write(`  ✓ ${plate.id}\n`)
   }
 
@@ -126,6 +162,7 @@ export type PlateId = keyof typeof PLATES
 
   const files = await readdir(outDir)
   console.log(`\n${manifest.length} plates → ${files.length} image files in public/img`)
+  if (kept) console.log(`${kept} left alone — your own artwork, from art/`)
 }
 
 main().catch((e) => {

@@ -188,7 +188,7 @@ export function LessonsScene() {
           className="absolute inset-0"
           style={{ background: 'radial-gradient(80% 62% at 50% 48%, rgb(var(--emerald-rgb) / .62), rgb(var(--ink-rgb) / 1) 74%)' }}
         />
-        <Plate id="ch-lessons" opacity={0.42} />
+        <Plate id="ch-lessons" opacity={0.58} />
         <GeometricPattern variant="khatam" opacity={0.04} scale={165} color="#8ec6a8" drift={!reduced} />
         <ParticleField weather="motes" density={0.65} color="#8ec6a8" opacity={0.45} />
       </div>

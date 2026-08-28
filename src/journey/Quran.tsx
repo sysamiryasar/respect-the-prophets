@@ -52,7 +52,7 @@ export function QuranScene() {
       className="cv-screen relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden px-5 py-20"
     >
       <div aria-hidden="true" className="absolute inset-0">
-        <Plate id="ch-quran" opacity={0.5} />
+        <Plate id="ch-quran" opacity={0.62} />
         <div
           className="absolute inset-0"
           style={{
